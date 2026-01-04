@@ -21,8 +21,8 @@ public class Role {
     @Column(name = "id")
     private Short id;
 
-    @Column(name = "role")
-    private String role;
+    @Column(name = "role_name")
+    private String roleName;
 
     @OneToMany(mappedBy = "role")
     private Set<User> users = new HashSet<>();
