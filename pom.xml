@@ -114,6 +114,11 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>11.20.0</version>
+                <configuration>
+                    <url>jdbc:mysql://localhost:3306/reservation-system?createDatabaseIfNotExist=true</url>
+                    <user>root</user>
+                    <password>root</password>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -1,4 +1,4 @@
-package com.ajaros.reservationsystem.repositories;
+package com.ajaros.reservationsystem.users.repositories;
 
 import com.ajaros.reservationsystem.users.entities.User;
 import org.springframework.data.repository.CrudRepository;

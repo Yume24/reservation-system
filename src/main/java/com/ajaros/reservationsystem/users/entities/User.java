@@ -1,9 +1,6 @@
 package com.ajaros.reservationsystem.users.entities;
 
-import com.ajaros.reservationsystem.roles.entities.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -31,8 +28,8 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id")
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
 
 

@@ -1,13 +1,14 @@
-package com.ajaros.reservationsystem.auth;
+package com.ajaros.reservationsystem.auth.services;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.ajaros.reservationsystem.repositories.UserRepository;
+import com.ajaros.reservationsystem.users.repositories.UserRepository;
 
 @AllArgsConstructor
 @Service
@@ -19,10 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(@Nonnull String email) throws UsernameNotFoundException {
         var user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UsernameNotFoundException("User with this email does not exist"));
-        var role = user.getRole().getRoleName();
+        var role = user.getRole();
         return User
                 .withUsername(user.getEmail())
-                .authorities(role)
+                .authorities(new SimpleGrantedAuthority("ROLE_" + role.toString()))
                 .password(user.getPassword())
                 .build();
     }
