@@ -1,5 +1,6 @@
 package com.ajaros.reservationsystem.auth;
 
+import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +15,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    @Nonnull
+    public UserDetails loadUserByUsername(@Nonnull String email) throws UsernameNotFoundException {
         var user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UsernameNotFoundException("User with this email does not exist"));
         var role = user.getRole().getRoleName();
