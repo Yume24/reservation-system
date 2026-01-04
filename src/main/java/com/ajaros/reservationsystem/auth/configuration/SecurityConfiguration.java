@@ -16,29 +16,31 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-       http
-               .csrf(AbstractHttpConfigurer::disable)
-               .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-           .authorizeHttpRequests(
-               r -> r
-                       .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                       .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                       .anyRequest().authenticated()
-       )
-               .exceptionHandling(c -> {
-           c.authenticationEntryPoint(
-                   new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-           c.accessDeniedHandler(((request, response, accessDeniedException) ->
-                   response.setStatus(HttpStatus.FORBIDDEN.value())));
-       });
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            r ->
+                r.requestMatchers(HttpMethod.POST, "/auth/register")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/login")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .exceptionHandling(
+            c -> {
+              c.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+              c.accessDeniedHandler(
+                  ((request, response, accessDeniedException) ->
+                      response.setStatus(HttpStatus.FORBIDDEN.value())));
+            });
 
-        return http.build();
-    }
+    return http.build();
+  }
 }

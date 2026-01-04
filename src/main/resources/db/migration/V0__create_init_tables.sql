@@ -6,7 +6,7 @@ create table Users
     name     varchar(50)      not null,
     surname  varchar(50)      not null,
     password varchar(255)     not null,
-    role_id     tinyint unsigned not null
+    role_id  tinyint unsigned not null
 );
 
 create table Roles
