@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class JwtConfiguration {
   private String secret;
+  private long accessTokenExpiration;
 
   public SecretKey getSecretKey() {
     return Keys.hmacShaKeyFor(secret.getBytes());
