@@ -1,6 +1,6 @@
 create table Users
 (
-    id       int unsigned auto_increment
+    id       bigint unsigned auto_increment
         primary key,
     email    varchar(255)                              not null unique,
     name     varchar(255)                              not null,
@@ -11,7 +11,7 @@ create table Users
 
 create table Rooms
 (
-    id       int unsigned auto_increment
+    id       bigint unsigned auto_increment
         primary key,
     name     varchar(255)      not null,
     capacity smallint unsigned null
