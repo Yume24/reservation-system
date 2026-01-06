@@ -1,7 +1,6 @@
 package com.ajaros.reservationsystem.users.services;
 
 import com.ajaros.reservationsystem.users.dtos.UpdateUserInformationRequest;
-import com.ajaros.reservationsystem.users.entities.User;
 import com.ajaros.reservationsystem.users.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,10 +10,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final UserRepository userRepository;
 
-  public void updateUserInformation(User user, UpdateUserInformationRequest request) {
-    user.setName(request.name());
-    user.setSurname(request.surname());
-
-    userRepository.save(user);
+  public void updateUserInformation(long userId, UpdateUserInformationRequest request) {
+    userRepository.updateUserInformation(userId, request.name(), request.surname());
   }
 }

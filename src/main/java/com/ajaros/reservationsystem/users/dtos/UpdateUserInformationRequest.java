@@ -9,4 +9,9 @@ public record UpdateUserInformationRequest(
         String name,
     @NotBlank(message = "Surname cannot be blank")
         @Size(max = 255, message = "Surname must not be longer than 255 characters")
-        String surname) {}
+        String surname) {
+  public UpdateUserInformationRequest {
+    name = name.trim();
+    surname = surname.trim();
+  }
+}

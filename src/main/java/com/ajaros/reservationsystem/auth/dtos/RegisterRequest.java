@@ -18,4 +18,9 @@ public record RegisterRequest(
         @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).+$",
             message = "Password must contain uppercase, lowercase, number, and special character")
-        String password) {}
+        String password) {
+  public RegisterRequest {
+    name = name.trim();
+    surname = surname.trim();
+  }
+}
