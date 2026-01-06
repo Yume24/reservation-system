@@ -10,6 +10,7 @@ import com.ajaros.reservationsystem.users.entities.User;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
 import com.ajaros.reservationsystem.users.repositories.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,10 +32,7 @@ public class AuthService {
     var surname = request.surname();
     var password = request.password();
 
-    var user = userRepository.findByEmail(email).orElse(null);
-    if (user != null) throw new UserAlreadyExistsException(email);
-
-    user =
+    var user =
         User.builder()
             .email(email)
             .name(name)
@@ -43,8 +41,11 @@ public class AuthService {
             .role(Role.USER)
             .build();
 
-    userRepository.save(user);
-
+    try {
+      userRepository.save(user);
+    } catch (DataIntegrityViolationException e) {
+      throw new UserAlreadyExistsException(email);
+    }
     return userMapper.toRegisterResponse(user);
   }
 
