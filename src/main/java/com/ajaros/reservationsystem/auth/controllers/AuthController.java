@@ -6,7 +6,6 @@ import com.ajaros.reservationsystem.auth.dtos.RegisterRequest;
 import com.ajaros.reservationsystem.auth.dtos.RegisterResponse;
 import com.ajaros.reservationsystem.auth.exceptions.UserAlreadyExistsException;
 import com.ajaros.reservationsystem.auth.services.AuthService;
-import com.ajaros.reservationsystem.auth.services.RegistrationService;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -19,13 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @AllArgsConstructor
 public class AuthController {
-  private final RegistrationService registrationService;
   private final AuthService authService;
 
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(
       @Valid @RequestBody RegisterRequest registerRequest) {
-    var registerResponse = registrationService.registerUser(registerRequest);
+    var registerResponse = authService.registerUser(registerRequest);
     return ResponseEntity.status(201).body(registerResponse);
   }
 
