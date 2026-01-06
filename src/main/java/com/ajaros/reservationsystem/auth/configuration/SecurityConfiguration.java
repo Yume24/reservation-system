@@ -29,28 +29,11 @@ public class SecurityConfiguration {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-    http.csrf(AbstractHttpConfigurer::disable)
-        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(
-            r ->
-                r.requestMatchers(HttpMethod.POST, "/auth/register")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/login")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .oauth2ResourceServer(
-            oauth2 ->
-                oauth2.jwt(
-                    jwt ->
-                        jwt.jwtAuthenticationConverter(
-                            jwtConfiguration.jwtAuthenticationConverter())))
-        .exceptionHandling(
-            c -> {
-              c.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-              c.accessDeniedHandler(
-                  ((_, response, _) -> response.setStatus(HttpStatus.FORBIDDEN.value())));
-            });
+    sessionManagementConfig(http);
+    csrfConfig(http);
+    authorizeRequestsConfig(http);
+    oauth2ResourceServerConfig(http);
+    exceptionHandlingConfig(http);
 
     return http.build();
   }
@@ -58,5 +41,41 @@ public class SecurityConfiguration {
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
     return config.getAuthenticationManager();
+  }
+
+  private void sessionManagementConfig(HttpSecurity http) {
+    http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+  }
+
+  private void csrfConfig(HttpSecurity http) {
+    http.csrf(AbstractHttpConfigurer::disable);
+  }
+
+  private void authorizeRequestsConfig(HttpSecurity http) {
+    http.authorizeHttpRequests(
+        r ->
+            r.requestMatchers(HttpMethod.POST, "/auth/register")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login")
+                .permitAll()
+                .anyRequest()
+                .authenticated());
+  }
+
+  private void oauth2ResourceServerConfig(HttpSecurity http) {
+    http.oauth2ResourceServer(
+        oauth2 ->
+            oauth2.jwt(
+                jwt ->
+                    jwt.jwtAuthenticationConverter(jwtConfiguration.jwtAuthenticationConverter())));
+  }
+
+  private void exceptionHandlingConfig(HttpSecurity http) {
+    http.exceptionHandling(
+        c -> {
+          c.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+          c.accessDeniedHandler(
+              ((_, response, _) -> response.setStatus(HttpStatus.FORBIDDEN.value())));
+        });
   }
 }
