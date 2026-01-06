@@ -22,8 +22,6 @@ public class JwtService {
         Jwts.claims()
             .subject(user.getEmail())
             .add("id", user.getId())
-            .add("name", user.getName())
-            .add("surname", user.getSurname())
             .add("roles", List.of(user.getRole()))
             .issuedAt(new Date())
             .expiration(new Date(System.currentTimeMillis() + 1000 * expiration))
