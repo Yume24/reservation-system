@@ -25,8 +25,8 @@ public class AuthController {
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(
       @Valid @RequestBody RegisterRequest registerRequest) {
-    registrationService.registerUser(registerRequest);
-    return ResponseEntity.status(201).body(new RegisterResponse(registerRequest.email()));
+    var registerResponse = registrationService.registerUser(registerRequest);
+    return ResponseEntity.status(201).body(registerResponse);
   }
 
   @PostMapping("/login")

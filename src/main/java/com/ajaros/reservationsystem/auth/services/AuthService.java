@@ -3,6 +3,7 @@ package com.ajaros.reservationsystem.auth.services;
 import com.ajaros.reservationsystem.auth.dtos.LoginRequest;
 import com.ajaros.reservationsystem.auth.dtos.LoginResponse;
 import com.ajaros.reservationsystem.users.entities.User;
+import com.ajaros.reservationsystem.users.mappers.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
+  private final UserMapper userMapper;
 
   public LoginResponse login(LoginRequest loginRequest) {
     var auth =
@@ -24,12 +26,6 @@ public class AuthService {
     if (user == null)
       throw new UsernameNotFoundException("User not found with email: " + loginRequest.email());
     var token = jwtService.generateAccessToken(user);
-    return LoginResponse.builder()
-        .token(token)
-        .email(user.getEmail())
-        .name(user.getName())
-        .surname(user.getSurname())
-        .role(user.getRole())
-        .build();
+    return userMapper.toLoginResponse(user, token);
   }
 }
