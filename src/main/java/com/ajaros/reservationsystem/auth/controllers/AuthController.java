@@ -31,8 +31,8 @@ public class AuthController {
 
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-    var token = authService.login(loginRequest);
-    return ResponseEntity.ok(new LoginResponse(token));
+    var loginResponse = authService.login(loginRequest);
+    return ResponseEntity.ok(loginResponse);
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
