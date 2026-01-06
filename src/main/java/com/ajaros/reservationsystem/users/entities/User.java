@@ -1,7 +1,13 @@
 package com.ajaros.reservationsystem.users.entities;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import java.util.Collection;
+import java.util.List;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @Setter
@@ -10,7 +16,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
@@ -31,4 +37,16 @@ public class User {
   @Column(name = "role")
   @Enumerated(EnumType.STRING)
   private Role role;
+
+  @Override
+  @Nonnull
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority(role.name()));
+  }
+
+  @Override
+  @Nonnull
+  public String getUsername() {
+    return email;
+  }
 }
