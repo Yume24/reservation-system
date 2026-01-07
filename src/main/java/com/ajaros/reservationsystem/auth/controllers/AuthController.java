@@ -1,11 +1,16 @@
 package com.ajaros.reservationsystem.auth.controllers;
 
+import com.ajaros.reservationsystem.auth.configuration.JwtConfiguration;
 import com.ajaros.reservationsystem.auth.dtos.LoginRequest;
 import com.ajaros.reservationsystem.auth.dtos.LoginResponse;
 import com.ajaros.reservationsystem.auth.dtos.RegisterRequest;
 import com.ajaros.reservationsystem.auth.dtos.RegisterResponse;
 import com.ajaros.reservationsystem.auth.exceptions.UserAlreadyExistsException;
 import com.ajaros.reservationsystem.auth.services.AuthService;
+import com.ajaros.reservationsystem.auth.services.RefreshTokenService;
+import com.ajaros.reservationsystem.users.mappers.UserMapper;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -19,6 +24,9 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class AuthController {
   private final AuthService authService;
+  private final UserMapper userMapper;
+  private final JwtConfiguration jwtConfiguration;
+  private final RefreshTokenService refreshTokenService;
 
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(
@@ -28,9 +36,31 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-    var loginResponse = authService.login(loginRequest);
-    return ResponseEntity.ok(loginResponse);
+  public ResponseEntity<LoginResponse> login(
+      @Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    var authTokensInfo = authService.login(loginRequest);
+
+    var user = authTokensInfo.user();
+    var accessToken = authTokensInfo.accessToken();
+    var refreshToken = authTokensInfo.refreshToken();
+
+    refreshTokenService.saveRefreshToken(refreshToken);
+
+    var refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+
+    refreshTokenCookie.setMaxAge((int) jwtConfiguration.getRefreshTokenExpiration());
+    refreshTokenCookie.setHttpOnly(true);
+    refreshTokenCookie.setSecure(true);
+    refreshTokenCookie.setPath("/auth/refresh");
+
+    response.addCookie(refreshTokenCookie);
+
+    return ResponseEntity.ok(userMapper.toLoginResponse(user, accessToken));
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<LoginResponse> refreshToken() {
+    return null;
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)

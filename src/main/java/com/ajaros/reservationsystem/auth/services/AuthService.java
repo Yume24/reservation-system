@@ -1,14 +1,14 @@
 package com.ajaros.reservationsystem.auth.services;
 
 import com.ajaros.reservationsystem.auth.dtos.LoginRequest;
-import com.ajaros.reservationsystem.auth.dtos.LoginResponse;
 import com.ajaros.reservationsystem.auth.dtos.RegisterRequest;
 import com.ajaros.reservationsystem.auth.dtos.RegisterResponse;
 import com.ajaros.reservationsystem.auth.exceptions.UserAlreadyExistsException;
+import com.ajaros.reservationsystem.auth.utils.AuthTokensInfo;
 import com.ajaros.reservationsystem.users.entities.Role;
 import com.ajaros.reservationsystem.users.entities.User;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
-import com.ajaros.reservationsystem.users.repositories.UserRepository;
+import com.ajaros.reservationsystem.users.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,8 +23,8 @@ public class AuthService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
   private final UserMapper userMapper;
-  private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final UserService userService;
 
   public RegisterResponse registerUser(RegisterRequest request) {
     var email = request.email();
@@ -42,14 +42,14 @@ public class AuthService {
             .build();
 
     try {
-      userRepository.save(user);
+      userService.saveUser(user);
     } catch (DataIntegrityViolationException e) {
       throw new UserAlreadyExistsException(email);
     }
     return userMapper.toRegisterResponse(user);
   }
 
-  public LoginResponse login(LoginRequest loginRequest) {
+  public AuthTokensInfo login(LoginRequest loginRequest) {
     var auth =
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
@@ -57,7 +57,8 @@ public class AuthService {
     var user = (User) auth.getPrincipal();
     if (user == null)
       throw new UsernameNotFoundException("User not found with email: " + loginRequest.email());
-    var token = jwtService.generateAccessToken(user);
-    return userMapper.toLoginResponse(user, token);
+    var accessToken = jwtService.generateAccessToken(user);
+    var refreshToken = jwtService.generateRefreshToken(user);
+    return new AuthTokensInfo(accessToken, refreshToken, user);
   }
 }

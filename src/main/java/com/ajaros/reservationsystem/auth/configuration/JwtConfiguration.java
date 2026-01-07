@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 public class JwtConfiguration {
   private String secret;
   private long accessTokenExpiration;
+  private long refreshTokenExpiration;
 
   public SecretKey getSecretKey() {
     return Keys.hmacShaKeyFor(secret.getBytes());
