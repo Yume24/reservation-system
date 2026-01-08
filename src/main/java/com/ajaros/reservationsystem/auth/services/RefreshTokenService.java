@@ -5,6 +5,7 @@ import com.ajaros.reservationsystem.auth.exceptions.InvalidTokenException;
 import com.ajaros.reservationsystem.auth.repositories.RefreshTokenRepository;
 import com.ajaros.reservationsystem.auth.utils.AuthTokensInfo;
 import com.ajaros.reservationsystem.auth.utils.HashUtility;
+import com.ajaros.reservationsystem.users.entities.User;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,7 +20,7 @@ public class RefreshTokenService {
   private final JwtService jwtService;
   private final JwtDecoder jwtDecoder;
 
-  public void saveRefreshToken(String refreshToken) {
+  public void saveRefreshToken(String refreshToken, User user) {
     var creationDate = jwtService.getIssuedAtFromToken(refreshToken);
     var expirationDate = jwtService.getExpirationFromToken(refreshToken);
 
@@ -28,6 +29,7 @@ public class RefreshTokenService {
             .token(HashUtility.hash(refreshToken))
             .creationDate(creationDate)
             .expirationDate(expirationDate)
+            .user(user)
             .build();
 
     refreshTokenRepository.save(refreshTokenEntity);
@@ -43,19 +45,18 @@ public class RefreshTokenService {
     var newRefreshToken = jwtService.generateRefreshToken(user);
     var newAccessToken = jwtService.generateAccessToken(user);
 
-    saveRefreshToken(newRefreshToken);
+    saveRefreshToken(newRefreshToken, user);
 
     return new AuthTokensInfo(newAccessToken, newRefreshToken, user);
   }
 
   private RefreshToken validateRefreshToken(Jwt refreshToken) {
-    var token =
-        refreshTokenRepository
-            .findByToken(HashUtility.hash(refreshToken.getTokenValue()))
-            .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
-    if (token.getCreationDate().isAfter(Instant.now()))
-      throw new InvalidTokenException("Invalid refresh token");
-    return token;
+    var expirationDate = jwtService.getExpirationFromToken(refreshToken);
+    if (expirationDate.isBefore(Instant.now()))
+      throw new InvalidTokenException("Expired refresh token");
+    return refreshTokenRepository
+        .findByToken(HashUtility.hash(refreshToken.getTokenValue()))
+        .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
   }
 
   private void deleteRefreshToken(RefreshToken refreshToken) {

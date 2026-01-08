@@ -1,5 +1,6 @@
 package com.ajaros.reservationsystem.auth.entities;
 
+import com.ajaros.reservationsystem.users.entities.User;
 import jakarta.persistence.*;
 import java.time.Instant;
 import lombok.*;
@@ -25,4 +26,8 @@ public class RefreshToken {
 
   @Column(name = "expiration_date")
   private Instant expirationDate;
+
+  @JoinColumn(name = "user")
+  @ManyToOne(fetch = FetchType.LAZY)
+  private User user;
 }
