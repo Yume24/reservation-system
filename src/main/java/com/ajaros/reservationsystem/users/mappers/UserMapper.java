@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-  @Mapping(target = "token", expression = "java(token)")
+  @Mapping(target = "accessToken", expression = "java(token)")
   LoginResponse toLoginResponse(User user, String token);
 
   RegisterResponse toRegisterResponse(User user);

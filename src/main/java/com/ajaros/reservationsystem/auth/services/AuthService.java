@@ -25,6 +25,7 @@ public class AuthService {
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
   private final UserService userService;
+  private final RefreshTokenService refreshTokenService;
 
   public RegisterResponse registerUser(RegisterRequest request) {
     var email = request.email();
@@ -59,6 +60,9 @@ public class AuthService {
       throw new UsernameNotFoundException("User not found with email: " + loginRequest.email());
     var accessToken = jwtService.generateAccessToken(user);
     var refreshToken = jwtService.generateRefreshToken(user);
+
+    refreshTokenService.saveRefreshToken(refreshToken);
+
     return new AuthTokensInfo(accessToken, refreshToken, user);
   }
 }

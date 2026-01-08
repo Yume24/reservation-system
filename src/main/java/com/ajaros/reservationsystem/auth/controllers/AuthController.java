@@ -5,15 +5,18 @@ import com.ajaros.reservationsystem.auth.dtos.LoginRequest;
 import com.ajaros.reservationsystem.auth.dtos.LoginResponse;
 import com.ajaros.reservationsystem.auth.dtos.RegisterRequest;
 import com.ajaros.reservationsystem.auth.dtos.RegisterResponse;
+import com.ajaros.reservationsystem.auth.exceptions.InvalidTokenException;
 import com.ajaros.reservationsystem.auth.exceptions.UserAlreadyExistsException;
 import com.ajaros.reservationsystem.auth.services.AuthService;
 import com.ajaros.reservationsystem.auth.services.RefreshTokenService;
+import com.ajaros.reservationsystem.auth.utils.AuthTokensInfo;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -39,12 +42,14 @@ public class AuthController {
   public ResponseEntity<LoginResponse> login(
       @Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
     var authTokensInfo = authService.login(loginRequest);
+    return getLoginResponseResponseEntity(authTokensInfo, response);
+  }
 
+  private @NonNull ResponseEntity<LoginResponse> getLoginResponseResponseEntity(
+      AuthTokensInfo authTokensInfo, HttpServletResponse response) {
     var user = authTokensInfo.user();
     var accessToken = authTokensInfo.accessToken();
     var refreshToken = authTokensInfo.refreshToken();
-
-    refreshTokenService.saveRefreshToken(refreshToken);
 
     var refreshTokenCookie = new Cookie("refreshToken", refreshToken);
 
@@ -59,8 +64,10 @@ public class AuthController {
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<LoginResponse> refreshToken() {
-    return null;
+  public ResponseEntity<LoginResponse> refreshToken(
+      @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+    var authTokensInfo = refreshTokenService.issueNewRefreshToken(refreshToken);
+    return getLoginResponseResponseEntity(authTokensInfo, response);
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
@@ -69,7 +76,7 @@ public class AuthController {
     return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
   }
 
-  @ExceptionHandler(BadCredentialsException.class)
+  @ExceptionHandler({BadCredentialsException.class, InvalidTokenException.class})
   public ResponseEntity<Void> handleBadCredentialsException() {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
   }
