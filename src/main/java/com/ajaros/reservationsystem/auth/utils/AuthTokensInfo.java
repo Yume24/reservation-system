@@ -1,5 +1,5 @@
 package com.ajaros.reservationsystem.auth.utils;
 
-import com.ajaros.reservationsystem.users.entities.User;
+import com.ajaros.reservationsystem.users.dtos.UserInformation;
 
-public record AuthTokensInfo(String accessToken, String refreshToken, User user) {}
+public record AuthTokensInfo(String accessToken, String refreshToken, UserInformation user) {}

@@ -6,10 +6,10 @@ import com.ajaros.reservationsystem.auth.repositories.RefreshTokenRepository;
 import com.ajaros.reservationsystem.auth.utils.AuthTokensInfo;
 import com.ajaros.reservationsystem.auth.utils.HashUtility;
 import com.ajaros.reservationsystem.users.entities.User;
+import com.ajaros.reservationsystem.users.mappers.UserMapper;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RefreshTokenService {
   private final RefreshTokenRepository refreshTokenRepository;
   private final JwtService jwtService;
-  private final JwtDecoder jwtDecoder;
+  private final UserMapper userMapper;
 
   public void saveRefreshToken(String refreshToken, User user) {
     var creationDate = jwtService.getIssuedAtFromToken(refreshToken);
@@ -37,7 +37,7 @@ public class RefreshTokenService {
 
   @Transactional
   public AuthTokensInfo issueNewRefreshToken(String refreshToken) {
-    var jwtRefreshToken = jwtDecoder.decode(refreshToken);
+    var jwtRefreshToken = jwtService.decode(refreshToken);
     var token = validateRefreshToken(jwtRefreshToken);
     var user = jwtService.getUserFromToken(jwtRefreshToken);
     deleteRefreshToken(token);
@@ -47,7 +47,7 @@ public class RefreshTokenService {
 
     saveRefreshToken(newRefreshToken, user);
 
-    return new AuthTokensInfo(newAccessToken, newRefreshToken, user);
+    return new AuthTokensInfo(newAccessToken, newRefreshToken, userMapper.toUserInformation(user));
   }
 
   private RefreshToken validateRefreshToken(Jwt refreshToken) {
