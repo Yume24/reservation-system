@@ -1,6 +1,7 @@
 package com.ajaros.reservationsystem.users.controllers;
 
 import com.ajaros.reservationsystem.auth.services.JwtService;
+import com.ajaros.reservationsystem.users.dtos.UpdatePasswordRequest;
 import com.ajaros.reservationsystem.users.dtos.UpdateUserInformationRequest;
 import com.ajaros.reservationsystem.users.dtos.UserInformation;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
@@ -35,6 +36,11 @@ public class UserController {
     return userMapper.toUserInformation(user);
   }
 
-  @PutMapping("/password")
-  public void updateUserPassword() {}
+  @PatchMapping("/password")
+  public ResponseEntity<Void> updateUserPassword(
+      @Valid @RequestBody UpdatePasswordRequest request, @AuthenticationPrincipal Jwt token) {
+    var userId = jwtService.getUserIdFromToken(token);
+    userService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
+    return ResponseEntity.noContent().build();
+  }
 }

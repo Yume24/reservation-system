@@ -6,12 +6,15 @@ import com.ajaros.reservationsystem.auth.exceptions.UserAlreadyExistsException;
 import com.ajaros.reservationsystem.users.dtos.UpdateUserInformationRequest;
 import com.ajaros.reservationsystem.users.entities.Role;
 import com.ajaros.reservationsystem.users.entities.User;
+import com.ajaros.reservationsystem.users.exceptions.PasswordChangeException;
+import com.ajaros.reservationsystem.users.exceptions.UserNotFoundException;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
 import com.ajaros.reservationsystem.users.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -20,8 +23,23 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
 
+  @Transactional
   public void updateUserInformation(long userId, UpdateUserInformationRequest request) {
-    userRepository.updateUserInformation(userId, request.name(), request.surname());
+    var user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    user.setName(request.name());
+    user.setSurname(request.surname());
+    userRepository.save(user);
+  }
+
+  @Transactional
+  public void updateUserPassword(long userId, String oldPassword, String newPassword) {
+    var user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+    if (!passwordEncoder.matches(oldPassword, user.getPassword()))
+      throw new PasswordChangeException("Old password is incorrect");
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+    userRepository.save(user);
   }
 
   public RegisterResponse registerUser(RegisterRequest request) {

@@ -1,5 +1,6 @@
 package com.ajaros.reservationsystem.exceptions;
 
+import com.ajaros.reservationsystem.users.exceptions.UserNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,11 @@ public class GlobalExceptionHandler {
         .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
     return ResponseEntity.badRequest().body(errors);
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<Void> handleUserNotFoundException() {
+    return ResponseEntity.notFound().build();
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
