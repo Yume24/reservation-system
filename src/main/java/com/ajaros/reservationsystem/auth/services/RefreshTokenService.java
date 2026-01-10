@@ -38,9 +38,9 @@ public class RefreshTokenService {
   @Transactional
   public AuthTokensInfo issueNewRefreshToken(String refreshToken) {
     var jwtRefreshToken = jwtService.decode(refreshToken);
-    var token = validateRefreshToken(jwtRefreshToken);
-    var user = jwtService.getUserFromToken(jwtRefreshToken);
-    deleteRefreshToken(token);
+    var validatedRefreshToken = validateRefreshToken(jwtRefreshToken);
+    var user = validatedRefreshToken.getUser();
+    deleteRefreshToken(validatedRefreshToken);
 
     var newRefreshToken = jwtService.generateRefreshToken(user);
     var newAccessToken = jwtService.generateAccessToken(user);
