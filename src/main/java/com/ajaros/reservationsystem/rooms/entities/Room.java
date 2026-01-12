@@ -1,6 +1,9 @@
 package com.ajaros.reservationsystem.rooms.entities;
 
+import com.ajaros.reservationsystem.equipment.entities.Equipment;
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,4 +22,7 @@ public class Room {
 
   @Column(name = "capacity")
   private Integer capacity;
+
+  @ManyToMany(mappedBy = "rooms")
+  private Set<Equipment> equipments = new HashSet<>();
 }

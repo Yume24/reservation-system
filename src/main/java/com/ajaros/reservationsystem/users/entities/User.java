@@ -1,7 +1,9 @@
 package com.ajaros.reservationsystem.users.entities;
 
+import com.ajaros.reservationsystem.auth.entities.RefreshToken;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import lombok.*;
@@ -37,6 +39,9 @@ public class User implements UserDetails {
   @Column(name = "role")
   @Enumerated(EnumType.STRING)
   private Role role;
+
+  @OneToMany(mappedBy = "user")
+  private List<RefreshToken> refreshTokens = new ArrayList<>();
 
   @Override
   @Nonnull
