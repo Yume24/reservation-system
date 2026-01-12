@@ -1,5 +1,6 @@
 package com.ajaros.reservationsystem.auth.configuration;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,89 +21,82 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-    private final JwtConfiguration jwtConfiguration;
+  private final JwtConfiguration jwtConfiguration;
 
-    @Value("${cors.allowed-origins}")
-    private List<String> allowedOrigins;
+  @Value("${cors.allowed-origins}")
+  private List<String> allowedOrigins;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        sessionManagementConfig(http);
-        csrfConfig(http);
-        corsConfig(http);
-        authorizeRequestsConfig(http);
-        oauth2ResourceServerConfig(http);
-        exceptionHandlingConfig(http);
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    sessionManagementConfig(http);
+    csrfConfig(http);
+    corsConfig(http);
+    authorizeRequestsConfig(http);
+    oauth2ResourceServerConfig(http);
+    exceptionHandlingConfig(http);
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
-        return config.getAuthenticationManager();
-    }
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+    return config.getAuthenticationManager();
+  }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        var config = new CorsConfiguration();
-        config.setAllowedOrigins(allowedOrigins);
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    var config = new CorsConfiguration();
+    config.setAllowedOrigins(allowedOrigins);
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+    config.setAllowedHeaders(List.of("*"));
+    config.setAllowCredentials(true);
 
-        var configSource = new UrlBasedCorsConfigurationSource();
-        configSource.registerCorsConfiguration("/**", config);
+    var configSource = new UrlBasedCorsConfigurationSource();
+    configSource.registerCorsConfiguration("/**", config);
 
-        return configSource;
-    }
+    return configSource;
+  }
 
-    private void sessionManagementConfig(HttpSecurity http) {
-        http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-    }
+  private void sessionManagementConfig(HttpSecurity http) {
+    http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+  }
 
-    private void csrfConfig(HttpSecurity http) {
-        http.csrf(AbstractHttpConfigurer::disable);
-    }
+  private void csrfConfig(HttpSecurity http) {
+    http.csrf(AbstractHttpConfigurer::disable);
+  }
 
-    private void authorizeRequestsConfig(HttpSecurity http) {
-        http.authorizeHttpRequests(
-                r ->
-                        r
-                                .requestMatchers("/auth/**")
-                                .permitAll()
-                                .anyRequest()
-                                .authenticated());
-    }
+  private void authorizeRequestsConfig(HttpSecurity http) {
+    http.authorizeHttpRequests(
+        r -> r.requestMatchers("/auth/**").permitAll().anyRequest().authenticated());
+  }
 
-    private void oauth2ResourceServerConfig(HttpSecurity http) {
-        http.oauth2ResourceServer(
-                oauth2 ->
-                        oauth2.jwt(
-                                jwt ->
-                                        jwt.jwtAuthenticationConverter(jwtConfiguration.jwtAuthenticationConverter())));
-    }
+  private void oauth2ResourceServerConfig(HttpSecurity http) {
+    http.oauth2ResourceServer(
+        oauth2 ->
+            oauth2.jwt(
+                jwt ->
+                    jwt.jwtAuthenticationConverter(jwtConfiguration.jwtAuthenticationConverter())));
+  }
 
-    private void exceptionHandlingConfig(HttpSecurity http) {
-        http.exceptionHandling(
-                c -> {
-                    c.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-                    c.accessDeniedHandler(
-                            ((_, response, _) -> response.setStatus(HttpStatus.FORBIDDEN.value())));
-                });
-    }
+  private void exceptionHandlingConfig(HttpSecurity http) {
+    http.exceptionHandling(
+        c -> {
+          c.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+          c.accessDeniedHandler(
+              ((_, response, _) -> response.setStatus(HttpStatus.FORBIDDEN.value())));
+        });
+  }
 
-    private void corsConfig(HttpSecurity http) {
-        http.cors(Customizer.withDefaults());
-    }
+  private void corsConfig(HttpSecurity http) {
+    http.cors(Customizer.withDefaults());
+  }
 }
