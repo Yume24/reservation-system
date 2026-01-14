@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "Equipment")
+@Table(name = "equipment")
 public class Equipment {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class Equipment {
 
   @ManyToMany
   @JoinTable(
-      name = "Room_equipment",
+      name = "room_equipment",
       joinColumns = @JoinColumn(name = "equipment_id"),
       inverseJoinColumns = @JoinColumn(name = "room_id"))
   private Set<Room> rooms = new HashSet<>();

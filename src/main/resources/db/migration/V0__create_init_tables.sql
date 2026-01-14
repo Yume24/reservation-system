@@ -1,4 +1,4 @@
-create table Users
+create table users
 (
     id       bigint unsigned auto_increment
         primary key,
@@ -9,7 +9,7 @@ create table Users
     role     enum ('ADMIN', 'USER', 'MANAGER', 'VIEW') not null
 );
 
-create table Rooms
+create table rooms
 (
     id       bigint unsigned auto_increment
         primary key,

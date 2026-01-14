@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "Refresh_tokens")
+@Table(name = "refresh_tokens")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

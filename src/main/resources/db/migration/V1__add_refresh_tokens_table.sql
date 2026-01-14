@@ -1,4 +1,4 @@
-create table Refresh_tokens
+create table refresh_tokens
 (
     id              bigint auto_increment
         primary key,
@@ -7,5 +7,5 @@ create table Refresh_tokens
     expiration_date DATETIME    not null
 );
 
-create index Refresh_tokens_token_index
-    on Refresh_tokens (token);
+create index refresh_tokens_token_index
+    on refresh_tokens (token);
