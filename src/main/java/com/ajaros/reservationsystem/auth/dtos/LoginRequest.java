@@ -9,5 +9,5 @@ public record LoginRequest(
         @Email(message = "Email must be valid")
         @NotBlank(message = "Email cannot be blank")
         String email,
-    @Schema(example = "password123") @NotBlank(message = "Password cannot be blank")
+    @Schema(example = "Password123!") @NotBlank(message = "Password cannot be blank")
         String password) {}
