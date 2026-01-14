@@ -76,7 +76,13 @@ public class SecurityConfiguration {
 
   private void authorizeRequestsConfig(HttpSecurity http) {
     http.authorizeHttpRequests(
-        r -> r.requestMatchers("/auth/**").permitAll().anyRequest().authenticated());
+        r ->
+            r.requestMatchers("/auth/**")
+                .permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated());
   }
 
   private void oauth2ResourceServerConfig(HttpSecurity http) {
