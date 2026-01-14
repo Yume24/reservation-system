@@ -1,19 +1,24 @@
 package com.ajaros.reservationsystem.auth.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
 public record RegisterRequest(
-    @NotBlank(message = "Email cannot be blank")
+    @Schema(example = "user@example.com")
+        @NotBlank(message = "Email cannot be blank")
         @Email(message = "Email must be valid")
         @Size(max = 255, message = "Email must not be longer than 255 characters")
         String email,
-    @NotBlank(message = "Name cannot be blank")
+    @Schema(example = "John")
+        @NotBlank(message = "Name cannot be blank")
         @Size(max = 255, message = "Name must not be longer than 255 characters")
         String name,
-    @NotBlank(message = "Surname cannot be blank")
+    @Schema(example = "Doe")
+        @NotBlank(message = "Surname cannot be blank")
         @Size(max = 255, message = "Surname must not be longer than 255 characters")
         String surname,
-    @NotBlank(message = "Password cannot be blank")
+    @Schema(example = "Password123!")
+        @NotBlank(message = "Password cannot be blank")
         @Size(min = 8, message = "Password must be at least 8 characters")
         @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).+$",

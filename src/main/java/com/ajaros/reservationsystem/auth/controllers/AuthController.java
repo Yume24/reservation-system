@@ -11,6 +11,10 @@ import com.ajaros.reservationsystem.auth.services.RefreshTokenService;
 import com.ajaros.reservationsystem.auth.utils.AuthTokensInfo;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
 import com.ajaros.reservationsystem.users.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -21,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @AllArgsConstructor
+@Tag(
+    name = "Authentication",
+    description = "Endpoints for user authentication and token management")
 public class AuthController {
   private final AuthService authService;
   private final UserMapper userMapper;
@@ -29,6 +36,12 @@ public class AuthController {
   private final CookieService cookieService;
   private final UserService userService;
 
+  @Operation(summary = "Register a new user", description = "Creates a new user account")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "201", description = "User successfully registered"),
+        @ApiResponse(responseCode = "400", description = "Invalid input or user already exists")
+      })
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(
       @Valid @RequestBody RegisterRequest registerRequest) {
@@ -36,6 +49,15 @@ public class AuthController {
     return ResponseEntity.status(201).body(registerResponse);
   }
 
+  @Operation(
+      summary = "Login",
+      description =
+          "Authenticates a user and returns access token in body and refresh token in cookie")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
+        @ApiResponse(responseCode = "401", description = "Invalid credentials")
+      })
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(
       @Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
@@ -43,6 +65,14 @@ public class AuthController {
     return getLoginResponseResponseEntity(authTokensInfo, response);
   }
 
+  @Operation(
+      summary = "Refresh token",
+      description = "Issues a new access token using the refresh token from cookie")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Token successfully refreshed"),
+        @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
+      })
   @PostMapping("/refresh")
   public ResponseEntity<LoginResponse> refreshToken(
       @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {

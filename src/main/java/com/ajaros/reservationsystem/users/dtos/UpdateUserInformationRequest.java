@@ -1,13 +1,16 @@
 package com.ajaros.reservationsystem.users.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record UpdateUserInformationRequest(
-    @NotBlank(message = "Name cannot be blank")
+    @Schema(example = "John")
+        @NotBlank(message = "Name cannot be blank")
         @Size(max = 255, message = "Name must not be longer than 255 characters")
         String name,
-    @NotBlank(message = "Surname cannot be blank")
+    @Schema(example = "Doe")
+        @NotBlank(message = "Surname cannot be blank")
         @Size(max = 255, message = "Surname must not be longer than 255 characters")
         String surname) {
   public UpdateUserInformationRequest {
