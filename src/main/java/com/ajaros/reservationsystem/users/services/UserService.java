@@ -23,6 +23,10 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
 
+  public User getUserByEmail(String email) {
+    return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+  }
+
   @Transactional
   public void updateUserInformation(long userId, UpdateUserInformationRequest request) {
     var user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
