@@ -3,7 +3,7 @@ package com.ajaros.reservationsystem.users.controllers;
 import com.ajaros.reservationsystem.auth.services.JwtService;
 import com.ajaros.reservationsystem.users.dtos.UpdatePasswordRequest;
 import com.ajaros.reservationsystem.users.dtos.UpdateUserInformationRequest;
-import com.ajaros.reservationsystem.users.dtos.UserInformation;
+import com.ajaros.reservationsystem.users.dtos.UserInformationResponse;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
 import com.ajaros.reservationsystem.users.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,7 +53,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
       })
   @GetMapping
-  public UserInformation getUserInformation(@AuthenticationPrincipal Jwt token) {
+  public UserInformationResponse getUserInformation(@AuthenticationPrincipal Jwt token) {
     var user = jwtService.getUserFromToken(token);
     return userMapper.toUserInformation(user);
   }

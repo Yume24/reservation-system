@@ -1,6 +1,6 @@
 package com.ajaros.reservationsystem.rooms.services;
 
-import com.ajaros.reservationsystem.rooms.dtos.RoomDtoWithId;
+import com.ajaros.reservationsystem.rooms.dtos.RoomResponse;
 import com.ajaros.reservationsystem.rooms.entities.Room;
 import com.ajaros.reservationsystem.rooms.exceptions.RoomNotFoundException;
 import com.ajaros.reservationsystem.rooms.mappers.RoomMapper;
@@ -16,23 +16,23 @@ public class RoomService {
   private final RoomRepository roomRepository;
   private final RoomMapper roomMapper;
 
-  public List<RoomDtoWithId> getAllRooms() {
+  public List<RoomResponse> getAllRooms() {
     return roomRepository.findAll().stream().map(roomMapper::toDtoWithId).toList();
   }
 
-  public RoomDtoWithId getRoomById(Long id) {
+  public RoomResponse getRoomById(Long id) {
     var room = roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
     return roomMapper.toDtoWithId(room);
   }
 
-  public RoomDtoWithId createRoom(String name, int capacity) {
+  public RoomResponse createRoom(String name, int capacity) {
     var room = Room.builder().name(name).capacity(capacity).build();
     var createdRoom = roomRepository.save(room);
     return roomMapper.toDtoWithId(createdRoom);
   }
 
   @Transactional
-  public RoomDtoWithId updateRoom(Long id, String newName, int newCapacity) {
+  public RoomResponse updateRoom(Long id, String newName, int newCapacity) {
     var room = roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
     room.setName(newName);
     room.setCapacity(newCapacity);

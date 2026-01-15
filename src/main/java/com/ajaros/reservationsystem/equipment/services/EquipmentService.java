@@ -1,6 +1,6 @@
 package com.ajaros.reservationsystem.equipment.services;
 
-import com.ajaros.reservationsystem.equipment.dtos.EquipmentDtoWithId;
+import com.ajaros.reservationsystem.equipment.dtos.EquipmentResponse;
 import com.ajaros.reservationsystem.equipment.entities.Equipment;
 import com.ajaros.reservationsystem.equipment.exceptions.EquipmentNotFoundException;
 import com.ajaros.reservationsystem.equipment.mappers.EquipmentMapper;
@@ -16,24 +16,24 @@ public class EquipmentService {
   private final EquipmentRepository equipmentRepository;
   private final EquipmentMapper equipmentMapper;
 
-  public List<EquipmentDtoWithId> getAllEquipment() {
+  public List<EquipmentResponse> getAllEquipment() {
     return equipmentRepository.findAll().stream().map(equipmentMapper::toDtoWithId).toList();
   }
 
-  public EquipmentDtoWithId getEquipmentById(Long id) {
+  public EquipmentResponse getEquipmentById(Long id) {
     var equipment =
         equipmentRepository.findById(id).orElseThrow(() -> new EquipmentNotFoundException(id));
     return equipmentMapper.toDtoWithId(equipment);
   }
 
-  public EquipmentDtoWithId createEquipment(String name) {
+  public EquipmentResponse createEquipment(String name) {
     var equipment = Equipment.builder().name(name).build();
     var createdEquipment = equipmentRepository.save(equipment);
     return equipmentMapper.toDtoWithId(createdEquipment);
   }
 
   @Transactional
-  public EquipmentDtoWithId updateEquipment(Long id, String newName) {
+  public EquipmentResponse updateEquipment(Long id, String newName) {
     var equipment =
         equipmentRepository.findById(id).orElseThrow(() -> new EquipmentNotFoundException(id));
     equipment.setName(newName);
