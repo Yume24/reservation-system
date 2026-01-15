@@ -1,7 +1,7 @@
 package com.ajaros.reservationsystem.rooms.controllers;
 
-import com.ajaros.reservationsystem.rooms.dtos.RoomDto;
 import com.ajaros.reservationsystem.rooms.dtos.RoomDtoWithId;
+import com.ajaros.reservationsystem.rooms.dtos.RoomRequest;
 import com.ajaros.reservationsystem.rooms.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,7 +56,7 @@ public class RoomController {
       })
   @PostMapping
   @RolesAllowed("ADMIN")
-  public ResponseEntity<RoomDtoWithId> createRoom(@Valid @RequestBody RoomDto request)
+  public ResponseEntity<RoomDtoWithId> createRoom(@Valid @RequestBody RoomRequest request)
       throws URISyntaxException {
 
     var room = roomService.createRoom(request.name(), request.capacity());
@@ -75,7 +75,7 @@ public class RoomController {
   @PutMapping("/{id}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<RoomDtoWithId> updateRoom(
-      @Valid @RequestBody RoomDto request, @PathVariable String id) {
+          @Valid @RequestBody RoomRequest request, @PathVariable String id) {
     var newRoom = roomService.updateRoom(Long.valueOf(id), request.name(), request.capacity());
     return ResponseEntity.ok(newRoom);
   }
