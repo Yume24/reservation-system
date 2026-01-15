@@ -4,13 +4,15 @@ import com.ajaros.reservationsystem.rooms.entities.Room;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "equipment")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Equipment {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
