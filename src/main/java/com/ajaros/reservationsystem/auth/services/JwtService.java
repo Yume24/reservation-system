@@ -2,11 +2,10 @@ package com.ajaros.reservationsystem.auth.services;
 
 import com.ajaros.reservationsystem.auth.configuration.JwtConfiguration;
 import com.ajaros.reservationsystem.users.entities.User;
-import com.ajaros.reservationsystem.users.repositories.UserRepository;
+import com.ajaros.reservationsystem.users.services.UserService;
 import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +13,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class JwtService {
   private final JwtConfiguration jwtConfiguration;
-  private final UserRepository userRepository;
   private final JwtDecoder jwtDecoder;
   private final JwtEncoder jwtEncoder;
+  private final UserService userService;
 
   public String generateAccessToken(User user) {
     return generateToken(user, jwtConfiguration.getAccessTokenExpiration());
@@ -48,9 +47,7 @@ public class JwtService {
 
   public User getUserFromToken(Jwt token) {
     var userId = getUserIdFromToken(token);
-    return userRepository
-        .findById(userId)
-        .orElseThrow(() -> new UsernameNotFoundException("User with id " + userId + " not found"));
+    return userService.getUserById(userId);
   }
 
   private String generateToken(User user, long expiration) {

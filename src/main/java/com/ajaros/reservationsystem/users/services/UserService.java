@@ -29,7 +29,7 @@ public class UserService {
 
   @Transactional
   public void updateUserInformation(long userId, UpdateUserInformationRequest request) {
-    var user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    var user = getUserById(userId);
     user.setName(request.name());
     user.setSurname(request.surname());
     userRepository.save(user);
@@ -37,7 +37,7 @@ public class UserService {
 
   @Transactional
   public void updateUserPassword(long userId, String oldPassword, String newPassword) {
-    var user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    var user = getUserById(userId);
 
     if (!passwordEncoder.matches(oldPassword, user.getPassword()))
       throw new PasswordChangeException("Old password is incorrect");
@@ -67,5 +67,9 @@ public class UserService {
       throw new UserAlreadyExistsException(email);
     }
     return userMapper.toRegisterResponse(user);
+  }
+
+  public User getUserById(long userId) {
+    return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
   }
 }
