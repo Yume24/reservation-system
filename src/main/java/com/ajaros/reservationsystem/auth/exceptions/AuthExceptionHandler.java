@@ -1,6 +1,5 @@
 package com.ajaros.reservationsystem.auth.exceptions;
 
-import com.ajaros.reservationsystem.auth.controllers.AuthController;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = AuthController.class)
+@RestControllerAdvice
 public class AuthExceptionHandler {
   @ExceptionHandler(UserAlreadyExistsException.class)
   public ResponseEntity<Map<String, String>> handleUserAlreadyExists(
