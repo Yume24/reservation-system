@@ -28,6 +28,7 @@ public class RoomController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved list of rooms"),
+        @ApiResponse(responseCode = "400", description = "Invalid request"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
       })
   @GetMapping
@@ -39,6 +40,7 @@ public class RoomController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved room"),
+        @ApiResponse(responseCode = "400", description = "Invalid room ID"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Room not found")
       })
@@ -85,6 +87,7 @@ public class RoomController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "204", description = "Room successfully deleted"),
+        @ApiResponse(responseCode = "400", description = "Invalid room ID"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden - Admin only"),
         @ApiResponse(responseCode = "404", description = "Room not found")
@@ -96,6 +99,17 @@ public class RoomController {
     return ResponseEntity.noContent().build();
   }
 
+  @Operation(
+      summary = "Add equipment to room",
+      description = "Assigns an equipment to a specific room")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "201", description = "Equipment successfully added to room"),
+        @ApiResponse(responseCode = "400", description = "Invalid input or IDs"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - Admin only"),
+        @ApiResponse(responseCode = "404", description = "Room or equipment not found")
+      })
   @PostMapping("/{roomId}/equipment/{equipmentId}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<Void> addEquipmentToRoom(
@@ -104,6 +118,19 @@ public class RoomController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
+  @Operation(
+      summary = "Remove equipment from room",
+      description = "Removes an equipment assignment from a specific room")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Equipment successfully removed from room"),
+        @ApiResponse(responseCode = "400", description = "Invalid input or IDs"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - Admin only"),
+        @ApiResponse(responseCode = "404", description = "Room or equipment not found")
+      })
   @DeleteMapping("/{roomId}/equipment/{equipmentId}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<Void> removeEquipmentFromRoom(

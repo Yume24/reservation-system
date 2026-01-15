@@ -31,6 +31,7 @@ public class EquipmentController {
         @ApiResponse(
             responseCode = "200",
             description = "Successfully retrieved list of equipment"),
+        @ApiResponse(responseCode = "400", description = "Invalid request"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
       })
   @GetMapping
@@ -44,6 +45,7 @@ public class EquipmentController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved equipment"),
+        @ApiResponse(responseCode = "400", description = "Invalid equipment ID"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Equipment not found")
       })
@@ -94,6 +96,7 @@ public class EquipmentController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "204", description = "Equipment successfully deleted"),
+        @ApiResponse(responseCode = "400", description = "Invalid equipment ID"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden - Admin only"),
         @ApiResponse(responseCode = "404", description = "Equipment not found")

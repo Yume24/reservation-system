@@ -50,6 +50,7 @@ public class UserController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved user information"),
+        @ApiResponse(responseCode = "400", description = "Invalid request"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
       })
   @GetMapping

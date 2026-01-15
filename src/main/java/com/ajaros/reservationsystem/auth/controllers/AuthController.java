@@ -56,6 +56,7 @@ public class AuthController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
         @ApiResponse(responseCode = "401", description = "Invalid credentials")
       })
   @PostMapping("/login")
@@ -71,6 +72,7 @@ public class AuthController {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Token successfully refreshed"),
+        @ApiResponse(responseCode = "400", description = "Missing or invalid refresh token"),
         @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
       })
   @PostMapping("/refresh")
