@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,8 +43,8 @@ public class RoomController {
         @ApiResponse(responseCode = "404", description = "Room not found")
       })
   @GetMapping("/{id}")
-  public RoomResponse getRoomById(@PathVariable String id) {
-    return roomService.getRoomById(Long.valueOf(id));
+  public RoomResponse getRoomById(@PathVariable Long id) {
+    return roomService.getRoomDtoById(id);
   }
 
   @Operation(summary = "Create a new room", description = "Creates a new room in the system")
@@ -75,8 +76,8 @@ public class RoomController {
   @PutMapping("/{id}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<RoomResponse> updateRoom(
-      @Valid @RequestBody RoomRequest request, @PathVariable String id) {
-    var newRoom = roomService.updateRoom(Long.valueOf(id), request.name(), request.capacity());
+      @Valid @RequestBody RoomRequest request, @PathVariable Long id) {
+    var newRoom = roomService.updateRoom(id, request.name(), request.capacity());
     return ResponseEntity.ok(newRoom);
   }
 
@@ -90,8 +91,24 @@ public class RoomController {
       })
   @DeleteMapping("/{id}")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<Void> deleteRoom(@PathVariable String id) {
-    roomService.deleteRoom(Long.valueOf(id));
+  public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
+    roomService.deleteRoom(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{roomId}/equipment/{equipmentId}")
+  @RolesAllowed("ADMIN")
+  public ResponseEntity<Void> addEquipmentToRoom(
+      @PathVariable Long roomId, @PathVariable Long equipmentId) {
+    roomService.addEquipmentToRoom(roomId, equipmentId);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  @DeleteMapping("/{roomId}/equipment/{equipmentId}")
+  @RolesAllowed("ADMIN")
+  public ResponseEntity<Void> removeEquipmentFromRoom(
+      @PathVariable Long roomId, @PathVariable Long equipmentId) {
+    roomService.removeEquipmentFromRoom(roomId, equipmentId);
     return ResponseEntity.noContent().build();
   }
 }

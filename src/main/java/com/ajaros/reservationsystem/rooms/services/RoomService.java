@@ -1,5 +1,6 @@
 package com.ajaros.reservationsystem.rooms.services;
 
+import com.ajaros.reservationsystem.equipment.services.EquipmentService;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponse;
 import com.ajaros.reservationsystem.rooms.entities.Room;
 import com.ajaros.reservationsystem.rooms.exceptions.RoomNotFoundException;
@@ -15,14 +16,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoomService {
   private final RoomRepository roomRepository;
   private final RoomMapper roomMapper;
+  private final EquipmentService equipmentService;
 
   public List<RoomResponse> getAllRooms() {
     return roomRepository.findAll().stream().map(roomMapper::toDtoWithId).toList();
   }
 
-  public RoomResponse getRoomById(Long id) {
-    var room = roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
-    return roomMapper.toDtoWithId(room);
+  public RoomResponse getRoomDtoById(Long id) {
+    return roomMapper.toDtoWithId(getRoomById(id));
+  }
+
+  public Room getRoomById(Long id) {
+    return roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
   }
 
   public RoomResponse createRoom(String name, int capacity) {
@@ -33,7 +38,7 @@ public class RoomService {
 
   @Transactional
   public RoomResponse updateRoom(Long id, String newName, int newCapacity) {
-    var room = roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
+    var room = getRoomById(id);
     room.setName(newName);
     room.setCapacity(newCapacity);
     var updatedRoom = roomRepository.save(room);
@@ -42,5 +47,25 @@ public class RoomService {
 
   public void deleteRoom(Long id) {
     roomRepository.deleteById(id);
+  }
+
+  @Transactional
+  public void addEquipmentToRoom(Long roomId, Long equipmentId) {
+    var room = getRoomById(roomId);
+    var equipment = equipmentService.getEquipmentById(equipmentId);
+
+    room.getEquipment().add(equipment);
+
+    roomRepository.save(room);
+  }
+
+  @Transactional
+  public void removeEquipmentFromRoom(Long roomId, Long equipmentId) {
+    var room = getRoomById(roomId);
+    var equipment = equipmentService.getEquipmentById(equipmentId);
+
+    room.getEquipment().remove(equipment);
+
+    roomRepository.save(room);
   }
 }

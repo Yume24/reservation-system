@@ -26,5 +26,5 @@ public class Room {
   private Integer capacity;
 
   @ManyToMany(mappedBy = "rooms")
-  private Set<Equipment> equipments = new HashSet<>();
+  private Set<Equipment> equipment = new HashSet<>();
 }

@@ -48,8 +48,8 @@ public class EquipmentController {
         @ApiResponse(responseCode = "404", description = "Equipment not found")
       })
   @GetMapping("/{id}")
-  public EquipmentResponse getEquipmentById(@PathVariable String id) {
-    return equipmentService.getEquipmentById(Long.valueOf(id));
+  public EquipmentResponse getEquipmentById(@PathVariable Long id) {
+    return equipmentService.getEquipmentDtoById(id);
   }
 
   @Operation(
@@ -83,9 +83,9 @@ public class EquipmentController {
   @RolesAllowed("ADMIN")
   @PutMapping("/{id}")
   public EquipmentResponse updateEquipment(
-      @Valid @RequestBody EquipmentRequest request, @PathVariable String id) {
+      @Valid @RequestBody EquipmentRequest request, @PathVariable Long id) {
 
-    return equipmentService.updateEquipment(Long.valueOf(id), request.name());
+    return equipmentService.updateEquipment(id, request.name());
   }
 
   @Operation(
@@ -100,8 +100,8 @@ public class EquipmentController {
       })
   @RolesAllowed("ADMIN")
   @DeleteMapping("{id}")
-  public ResponseEntity<Void> deleteEquipment(@PathVariable String id) {
-    equipmentService.deleteEquipment(Long.valueOf(id));
+  public ResponseEntity<Void> deleteEquipment(@PathVariable Long id) {
+    equipmentService.deleteEquipment(id);
     return ResponseEntity.noContent().build();
   }
 }

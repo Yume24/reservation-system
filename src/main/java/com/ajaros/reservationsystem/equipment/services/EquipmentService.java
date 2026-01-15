@@ -17,19 +17,23 @@ public class EquipmentService {
   private final EquipmentMapper equipmentMapper;
 
   public List<EquipmentResponse> getAllEquipment() {
-    return equipmentRepository.findAll().stream().map(equipmentMapper::toDtoWithId).toList();
+    return equipmentRepository.findAll().stream()
+        .map(equipmentMapper::toEquipmentResponse)
+        .toList();
   }
 
-  public EquipmentResponse getEquipmentById(Long id) {
-    var equipment =
-        equipmentRepository.findById(id).orElseThrow(() -> new EquipmentNotFoundException(id));
-    return equipmentMapper.toDtoWithId(equipment);
+  public EquipmentResponse getEquipmentDtoById(Long id) {
+    return equipmentMapper.toEquipmentResponse(getEquipmentById(id));
+  }
+
+  public Equipment getEquipmentById(Long id) {
+    return equipmentRepository.findById(id).orElseThrow(() -> new EquipmentNotFoundException(id));
   }
 
   public EquipmentResponse createEquipment(String name) {
     var equipment = Equipment.builder().name(name).build();
     var createdEquipment = equipmentRepository.save(equipment);
-    return equipmentMapper.toDtoWithId(createdEquipment);
+    return equipmentMapper.toEquipmentResponse(createdEquipment);
   }
 
   @Transactional
@@ -38,7 +42,7 @@ public class EquipmentService {
         equipmentRepository.findById(id).orElseThrow(() -> new EquipmentNotFoundException(id));
     equipment.setName(newName);
     var updatedEquipment = equipmentRepository.save(equipment);
-    return equipmentMapper.toDtoWithId(updatedEquipment);
+    return equipmentMapper.toEquipmentResponse(updatedEquipment);
   }
 
   public void deleteEquipment(Long id) {

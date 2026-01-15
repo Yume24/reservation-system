@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface EquipmentMapper {
-  EquipmentResponse toDtoWithId(Equipment equipment);
+  EquipmentResponse toEquipmentResponse(Equipment equipment);
 }
