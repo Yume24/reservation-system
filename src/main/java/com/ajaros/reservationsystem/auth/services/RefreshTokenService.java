@@ -37,8 +37,7 @@ public class RefreshTokenService {
 
   @Transactional
   public AuthTokensInfo issueNewRefreshToken(String refreshToken) {
-    var jwtRefreshToken = jwtService.decode(refreshToken);
-    var validatedRefreshToken = validateRefreshToken(jwtRefreshToken);
+    var validatedRefreshToken = validateRefreshToken(refreshToken);
     var user = validatedRefreshToken.getUser();
     deleteRefreshToken(validatedRefreshToken);
 
@@ -50,6 +49,12 @@ public class RefreshTokenService {
     return new AuthTokensInfo(newAccessToken, newRefreshToken, userMapper.toUserInformation(user));
   }
 
+  @Transactional
+  public void logout(String refreshToken) {
+    var validatedRefreshToken = validateRefreshToken(refreshToken);
+    deleteRefreshToken(validatedRefreshToken);
+  }
+
   private RefreshToken validateRefreshToken(Jwt refreshToken) {
     var expirationDate = jwtService.getExpirationFromToken(refreshToken);
     if (expirationDate.isBefore(Instant.now()))
@@ -57,6 +62,10 @@ public class RefreshTokenService {
     return refreshTokenRepository
         .findByToken(HashUtility.hash(refreshToken.getTokenValue()))
         .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
+  }
+
+  private RefreshToken validateRefreshToken(String refreshToken) {
+    return validateRefreshToken(jwtService.decode(refreshToken));
   }
 
   private void deleteRefreshToken(RefreshToken refreshToken) {

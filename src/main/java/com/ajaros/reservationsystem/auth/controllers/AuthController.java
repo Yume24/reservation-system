@@ -82,6 +82,15 @@ public class AuthController {
     return getLoginResponseResponseEntity(authTokensInfo, response);
   }
 
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(
+      @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+    refreshTokenService.logout(refreshToken);
+    var cookie = cookieService.deleteRefreshTokenCookie();
+    response.addCookie(cookie);
+    return ResponseEntity.noContent().build();
+  }
+
   private @NonNull ResponseEntity<LoginResponse> getLoginResponseResponseEntity(
       AuthTokensInfo authTokensInfo, HttpServletResponse response) {
     var user = authTokensInfo.user();

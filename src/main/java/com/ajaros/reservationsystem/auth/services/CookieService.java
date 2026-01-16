@@ -9,9 +9,13 @@ public class CookieService {
     var cookie = new Cookie("refreshToken", token);
     cookie.setHttpOnly(true);
     cookie.setSecure(true);
-    cookie.setPath("/auth/refresh");
+    cookie.setPath("/auth/**");
     cookie.setMaxAge(duration);
 
     return cookie;
+  }
+
+  public Cookie deleteRefreshTokenCookie() {
+    return createRefreshTokenCookie("", 0);
   }
 }
