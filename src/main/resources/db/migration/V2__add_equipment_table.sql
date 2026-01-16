@@ -2,9 +2,7 @@ create table equipment
 (
     id   bigint unsigned auto_increment
         primary key,
-    name varchar(255) not null,
-    constraint equipment_pk_2
-        unique (name)
+    name varchar(255) not null unique
 );
 
 create table room_equipment
