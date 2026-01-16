@@ -24,7 +24,7 @@ public class ReservationService {
   private final EntityManager entityManager;
 
   public List<ReservationResponse> getFilteredReservations(
-      long userId, Instant from, Instant to, Long roomId) {
+      Long userId, Instant from, Instant to, Long roomId) {
     return reservationRepository.findFiltered(from, to, roomId, userId).stream()
         .map(reservationMapper::toReservationResponse)
         .toList();
@@ -47,22 +47,44 @@ public class ReservationService {
     var reservation = findReservationById(reservationId);
     checkIfUserHasPermissionToModifyReservation(reservation, userId);
 
+    deleteReservation(reservationId);
+  }
+
+  public void deleteReservation(Long reservationId) {
     reservationRepository.deleteById(reservationId);
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public ReservationResponse updateReservation(
+  public ReservationResponse updateReservationEntity(
       Long reservationId, Long userId, Long roomId, Instant fromDate, Instant toDate) {
     var reservation = findReservationById(reservationId);
 
     checkIfUserHasPermissionToModifyReservation(reservation, userId);
     checkRoomAvailability(fromDate, toDate, roomId);
 
+    reservation = updateReservationEntity(reservation, fromDate, toDate, roomId);
+
+    return reservationMapper.toReservationResponse(reservation);
+  }
+
+  public ReservationResponse updateReservationEntity(
+      Long reservationId, long roomId, Instant fromDate, Instant toDate) {
+    var reservation = findReservationById(reservationId);
+
+    checkRoomAvailability(fromDate, toDate, roomId);
+
+    reservation = updateReservationEntity(reservation, fromDate, toDate, roomId);
+
+    return reservationMapper.toReservationResponse(reservation);
+  }
+
+  private Reservation updateReservationEntity(
+      Reservation reservation, Instant fromDate, Instant toDate, Long roomId) {
     reservation.setFromDate(fromDate);
     reservation.setToDate(toDate);
     reservation.setRoom(entityManager.getReference(Room.class, roomId));
 
-    return reservationMapper.toReservationResponse(reservationRepository.save(reservation));
+    return reservationRepository.save(reservation);
   }
 
   private void checkRoomAvailability(Instant from, Instant to, Long roomId) {

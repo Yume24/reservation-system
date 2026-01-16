@@ -57,7 +57,7 @@ public class ReservationUserController {
       @RequestBody ReservationRequest request) {
     var userId = jwtService.getUserIdFromToken(token);
     var reservation =
-        reservationService.updateReservation(
+        reservationService.updateReservationEntity(
             reservationId, userId, request.roomId(), request.fromDate(), request.toDate());
     return ResponseEntity.ok(reservation);
   }
