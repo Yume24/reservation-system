@@ -1,6 +1,7 @@
 package com.ajaros.reservationsystem.rooms.entities;
 
 import com.ajaros.reservationsystem.equipment.entities.Equipment;
+import com.ajaros.reservationsystem.reservations.entites.Reservation;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,4 +28,7 @@ public class Room {
 
   @ManyToMany(mappedBy = "rooms")
   private Set<Equipment> equipment = new HashSet<>();
+
+  @OneToMany(mappedBy = "room")
+  private Set<Reservation> reservations = new HashSet<>();
 }

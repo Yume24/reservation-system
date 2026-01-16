@@ -1,11 +1,10 @@
 package com.ajaros.reservationsystem.users.entities;
 
 import com.ajaros.reservationsystem.auth.entities.RefreshToken;
+import com.ajaros.reservationsystem.reservations.entites.Reservation;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -41,7 +40,10 @@ public class User implements UserDetails {
   private Role role;
 
   @OneToMany(mappedBy = "user")
-  private List<RefreshToken> refreshTokens = new ArrayList<>();
+  private Set<RefreshToken> refreshTokens = new HashSet<>();
+
+  @OneToMany(mappedBy = "user")
+  private Set<Reservation> reservations = new HashSet<>();
 
   @Override
   @Nonnull
