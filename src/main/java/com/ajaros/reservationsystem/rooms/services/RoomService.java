@@ -19,11 +19,11 @@ public class RoomService {
   private final EquipmentService equipmentService;
 
   public List<RoomResponse> getAllRooms() {
-    return roomRepository.findAll().stream().map(roomMapper::toDtoWithId).toList();
+    return roomRepository.findAll().stream().map(roomMapper::toRoomResponse).toList();
   }
 
   public RoomResponse getRoomDtoById(Long id) {
-    return roomMapper.toDtoWithId(getRoomById(id));
+    return roomMapper.toRoomResponse(getRoomById(id));
   }
 
   public Room getRoomById(Long id) {
@@ -33,7 +33,7 @@ public class RoomService {
   public RoomResponse createRoom(String name, int capacity) {
     var room = Room.builder().name(name).capacity(capacity).build();
     var createdRoom = roomRepository.save(room);
-    return roomMapper.toDtoWithId(createdRoom);
+    return roomMapper.toRoomResponse(createdRoom);
   }
 
   @Transactional
@@ -42,7 +42,7 @@ public class RoomService {
     room.setName(newName);
     room.setCapacity(newCapacity);
     var updatedRoom = roomRepository.save(room);
-    return roomMapper.toDtoWithId(updatedRoom);
+    return roomMapper.toRoomResponse(updatedRoom);
   }
 
   public void deleteRoom(Long id) {
