@@ -82,6 +82,15 @@ public class AuthController {
     return getLoginResponseResponseEntity(authTokensInfo, response);
   }
 
+  @Operation(
+      summary = "Logout",
+      description = "Invalidates the refresh token and clears the cookie")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "Successfully logged out"),
+        @ApiResponse(responseCode = "400", description = "Missing refresh token"),
+        @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
+      })
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(
       @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
