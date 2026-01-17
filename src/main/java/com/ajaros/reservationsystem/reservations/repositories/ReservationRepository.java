@@ -20,6 +20,6 @@ AND (:userId IS NULL OR :userId = r.user.id)
   List<Reservation> findFiltered(
       @Param("from") Instant from,
       @Param("to") Instant to,
-      @Param("room_id") Long roomId,
-      @Param("user_id") Long userId);
+      @Param("roomId") Long roomId,
+      @Param("userId") Long userId);
 }
