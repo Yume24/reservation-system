@@ -6,9 +6,8 @@ import com.ajaros.reservationsystem.reservations.exceptions.InvalidReservationEx
 import com.ajaros.reservationsystem.reservations.exceptions.ReservationNotFoundException;
 import com.ajaros.reservationsystem.reservations.mappers.ReservationMapper;
 import com.ajaros.reservationsystem.reservations.repositories.ReservationRepository;
-import com.ajaros.reservationsystem.rooms.entities.Room;
-import com.ajaros.reservationsystem.users.entities.User;
-import jakarta.persistence.EntityManager;
+import com.ajaros.reservationsystem.rooms.services.RoomService;
+import com.ajaros.reservationsystem.users.services.UserService;
 import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -21,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
   private final ReservationRepository reservationRepository;
   private final ReservationMapper reservationMapper;
-  private final EntityManager entityManager;
+  private final RoomService roomService;
+  private final UserService userService;
 
   public List<ReservationResponse> getFilteredReservations(
       Long userId, Instant from, Instant to, Long roomId) {
@@ -34,8 +34,8 @@ public class ReservationService {
   public ReservationResponse createReservation(Instant from, Instant to, Long roomId, Long userId) {
     checkRoomAvailability(from, to, roomId);
 
-    var room = entityManager.getReference(Room.class, roomId);
-    var user = entityManager.getReference(User.class, userId);
+    var room = roomService.getRoomById(roomId);
+    var user = userService.getUserById(userId);
 
     var reservation = Reservation.builder().fromDate(from).toDate(to).user(user).room(room).build();
 
@@ -82,7 +82,7 @@ public class ReservationService {
       Reservation reservation, Instant fromDate, Instant toDate, Long roomId) {
     reservation.setFromDate(fromDate);
     reservation.setToDate(toDate);
-    reservation.setRoom(entityManager.getReference(Room.class, roomId));
+    reservation.setRoom(roomService.getRoomById(roomId));
 
     return reservationRepository.save(reservation);
   }
