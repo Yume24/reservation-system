@@ -8,5 +8,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ReservationMapper {
   @Mapping(target = "roomId", expression = "java(reservation.getRoom().getId())")
+  @Mapping(target = "userId", expression = "java(reservation.getUser().getId())")
   ReservationResponse toReservationResponse(Reservation reservation);
 }
