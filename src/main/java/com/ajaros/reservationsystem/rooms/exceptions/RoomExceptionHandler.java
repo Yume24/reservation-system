@@ -12,7 +12,7 @@ public class RoomExceptionHandler {
   }
 
   @ExceptionHandler(AvailibilityException.class)
-  public ResponseEntity<Void> handleAvailibilityException() {
+  public ResponseEntity<Void> handleAvailabilityException() {
     return ResponseEntity.badRequest().build();
   }
 }

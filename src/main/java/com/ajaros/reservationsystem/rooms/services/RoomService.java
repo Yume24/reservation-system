@@ -36,9 +36,11 @@ public class RoomService {
 
   public List<RoomResponseWithEquipment> getMatchingRooms(
       Integer capacity, Instant from, Instant to, Set<String> equipmentNames) {
-    if (from.isAfter(to)) throw new AvailibilityException("From date must be before to date");
+    validateDateRange(from, to);
 
-    return roomRepository.findMatchingRooms(capacity, from, to, equipmentNames).stream()
+    return roomRepository
+        .findMatchingRooms(capacity, from, to, equipmentNames, getEquipmentCount(equipmentNames))
+        .stream()
         .map(roomMapper::toRoomResponseWithEquipment)
         .toList();
   }
@@ -80,5 +82,13 @@ public class RoomService {
     room.getEquipment().remove(equipment);
 
     roomRepository.save(room);
+  }
+
+  private void validateDateRange(Instant from, Instant to) {
+    if (from.isAfter(to)) throw new AvailibilityException("From date must be before to date");
+  }
+
+  private int getEquipmentCount(Set<String> equipmentNames) {
+    return equipmentNames == null ? 0 : equipmentNames.size();
   }
 }

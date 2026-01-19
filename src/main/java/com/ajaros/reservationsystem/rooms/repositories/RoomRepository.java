@@ -20,15 +20,16 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                 where reservation.fromDate < :to
                 and reservation.toDate > :from
         )
-        and (:equipmentNames is null or not exists (
-                select equipment from Equipment equipment
+        and (:equipmentNames is null or (
+                select count(distinct equipment.name) from room.equipment equipment
                 where equipment.name in :equipmentNames
-                and equipment not in elements(room.equipment)
-        ))
+        ) = :equipmentCount)
+        order by room.capacity
 """)
   List<Room> findMatchingRooms(
       @Param("capacity") Integer capacity,
       @Param("from") Instant from,
       @Param("to") Instant to,
-      @Param("equipmentNames") Set<String> equipmentNames);
+      @Param("equipmentNames") Set<String> equipmentNames,
+      @Param("equipmentCount") Integer equipmentCount);
 }
