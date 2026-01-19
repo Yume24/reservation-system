@@ -2,11 +2,14 @@ package com.ajaros.reservationsystem.rooms.services;
 
 import com.ajaros.reservationsystem.equipment.services.EquipmentService;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponse;
+import com.ajaros.reservationsystem.rooms.dtos.RoomResponseWithEquipment;
 import com.ajaros.reservationsystem.rooms.entities.Room;
 import com.ajaros.reservationsystem.rooms.exceptions.RoomNotFoundException;
 import com.ajaros.reservationsystem.rooms.mappers.RoomMapper;
 import com.ajaros.reservationsystem.rooms.repositories.RoomRepository;
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,13 @@ public class RoomService {
 
   public Room getRoomById(Long id) {
     return roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
+  }
+
+  public List<RoomResponseWithEquipment> getMatchingRooms(
+      Integer capacity, Instant from, Instant to, Set<String> equipmentNames) {
+    return roomRepository.findMatchingRooms(capacity, from, to, equipmentNames).stream()
+        .map(roomMapper::toRoomResponseWithEquipment)
+        .toList();
   }
 
   public RoomResponse createRoom(String name, int capacity) {

@@ -2,6 +2,7 @@ package com.ajaros.reservationsystem.rooms.controllers;
 
 import com.ajaros.reservationsystem.rooms.dtos.RoomRequest;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponse;
+import com.ajaros.reservationsystem.rooms.dtos.RoomResponseWithEquipment;
 import com.ajaros.reservationsystem.rooms.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,7 +12,9 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +50,27 @@ public class RoomController {
   @GetMapping("/{id}")
   public RoomResponse getRoomById(@PathVariable Long id) {
     return roomService.getRoomDtoById(id);
+  }
+
+  @Operation(
+      summary = "Get available rooms",
+      description =
+          "Returns a list of rooms that are available in a given time slot and match the criteria")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved list of available rooms"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+      })
+  @GetMapping("/available")
+  public List<RoomResponseWithEquipment> getAvailableRooms(
+      @RequestParam Integer capacity,
+      @RequestParam Instant from,
+      @RequestParam Instant to,
+      @RequestParam Set<String> equipmentNames) {
+    return roomService.getMatchingRooms(capacity, from, to, equipmentNames);
   }
 
   @Operation(summary = "Create a new room", description = "Creates a new room in the system")
