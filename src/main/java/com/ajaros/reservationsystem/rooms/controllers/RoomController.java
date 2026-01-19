@@ -66,10 +66,10 @@ public class RoomController {
       })
   @GetMapping("/available")
   public List<RoomResponseWithEquipment> getAvailableRooms(
-      @RequestParam Integer capacity,
-      @RequestParam Instant from,
-      @RequestParam Instant to,
-      @RequestParam Set<String> equipmentNames) {
+      @RequestParam(name = "capacity", required = false) Integer capacity,
+      @RequestParam(name = "from") Instant from,
+      @RequestParam(name = "to") Instant to,
+      @RequestParam(name = "equipmentNames", required = false) Set<String> equipmentNames) {
     return roomService.getMatchingRooms(capacity, from, to, equipmentNames);
   }
 
