@@ -17,14 +17,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 @AllArgsConstructor
+@Validated
 @Tag(
     name = "Authentication",
     description = "Endpoints for user authentication and token management")
@@ -77,7 +80,7 @@ public class AuthController {
       })
   @PostMapping("/refresh")
   public ResponseEntity<LoginResponse> refreshToken(
-      @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+      @CookieValue("refreshToken") @NotBlank String refreshToken, HttpServletResponse response) {
     var authTokensInfo = refreshTokenService.issueNewRefreshToken(refreshToken);
     return getLoginResponseResponseEntity(authTokensInfo, response);
   }
@@ -93,7 +96,7 @@ public class AuthController {
       })
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(
-      @CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+      @CookieValue("refreshToken") @NotBlank String refreshToken, HttpServletResponse response) {
     refreshTokenService.logout(refreshToken);
     var cookie = cookieService.deleteRefreshTokenCookie();
     response.addCookie(cookie);

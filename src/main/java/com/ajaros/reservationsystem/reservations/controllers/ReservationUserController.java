@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Positive;
 import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -17,12 +19,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/reservations/user")
 @RolesAllowed("USER")
 @AllArgsConstructor
+@Validated
 @Tag(
     name = "User Reservations",
     description = "Endpoints for users to manage their own reservations")
@@ -43,9 +47,9 @@ public class ReservationUserController {
   @GetMapping
   public List<ReservationResponse> getUserReservations(
       @AuthenticationPrincipal Jwt token,
-      @RequestParam(required = false, name = "from") Instant from,
-      @RequestParam(required = false, name = "to") Instant to,
-      @RequestParam(required = false, name = "roomId") Long roomId) {
+      @RequestParam(required = false, name = "from") @FutureOrPresent Instant from,
+      @RequestParam(required = false, name = "to") @FutureOrPresent Instant to,
+      @RequestParam(required = false, name = "roomId") @Positive Long roomId) {
     var userId = jwtService.getUserIdFromToken(token);
     return reservationService.getFilteredReservations(userId, from, to, roomId);
   }
@@ -85,7 +89,7 @@ public class ReservationUserController {
       })
   @DeleteMapping("/{reservationId}")
   public ResponseEntity<Void> deleteReservation(
-      @PathVariable Long reservationId, @AuthenticationPrincipal Jwt token) {
+      @PathVariable @Positive Long reservationId, @AuthenticationPrincipal Jwt token) {
     var userId = jwtService.getUserIdFromToken(token);
     reservationService.deleteReservation(reservationId, userId);
     return ResponseEntity.noContent().build();
@@ -106,7 +110,7 @@ public class ReservationUserController {
       })
   @PutMapping("/{reservationId}")
   public ResponseEntity<ReservationResponse> updateReservation(
-      @PathVariable Long reservationId,
+      @PathVariable @Positive Long reservationId,
       @AuthenticationPrincipal Jwt token,
       @Valid @RequestBody ReservationRequest request) {
     var userId = jwtService.getUserIdFromToken(token);

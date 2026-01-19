@@ -7,15 +7,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Positive;
 import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RolesAllowed("VIEWER")
 @RequestMapping("/reservations/viewer")
 @AllArgsConstructor
+@Validated
 @Tag(name = "Reservation Viewer", description = "Endpoints for viewing reservations")
 public class ReservationViewerController {
   private final ReservationService reservationService;
@@ -34,9 +38,9 @@ public class ReservationViewerController {
       })
   @GetMapping("/{roomId}")
   public List<ReservationResponse> getRoomReservations(
-      @PathVariable Long roomId,
-      @RequestParam(required = false, name = "from") Instant from,
-      @RequestParam(required = false, name = "to") Instant to) {
+      @PathVariable @Positive Long roomId,
+      @RequestParam(required = false, name = "from") @FutureOrPresent Instant from,
+      @RequestParam(required = false, name = "to") @FutureOrPresent Instant to) {
     return reservationService.getFilteredReservations(null, from, to, roomId);
   }
 }

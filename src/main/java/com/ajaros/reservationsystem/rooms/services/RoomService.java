@@ -4,6 +4,7 @@ import com.ajaros.reservationsystem.equipment.services.EquipmentService;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponse;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponseWithEquipment;
 import com.ajaros.reservationsystem.rooms.entities.Room;
+import com.ajaros.reservationsystem.rooms.exceptions.AvailibilityException;
 import com.ajaros.reservationsystem.rooms.exceptions.RoomNotFoundException;
 import com.ajaros.reservationsystem.rooms.mappers.RoomMapper;
 import com.ajaros.reservationsystem.rooms.repositories.RoomRepository;
@@ -35,6 +36,8 @@ public class RoomService {
 
   public List<RoomResponseWithEquipment> getMatchingRooms(
       Integer capacity, Instant from, Instant to, Set<String> equipmentNames) {
+    if (from.isAfter(to)) throw new AvailibilityException("From date must be before to date");
+
     return roomRepository.findMatchingRooms(capacity, from, to, equipmentNames).stream()
         .map(roomMapper::toRoomResponseWithEquipment)
         .toList();

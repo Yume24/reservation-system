@@ -9,16 +9,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/equipment")
 @AllArgsConstructor
+@Validated
 @Tag(name = "Equipment Management", description = "Endpoints for managing equipment")
 public class EquipmentController {
   private final EquipmentService equipmentService;
@@ -50,7 +53,7 @@ public class EquipmentController {
         @ApiResponse(responseCode = "404", description = "Equipment not found")
       })
   @GetMapping("/{id}")
-  public EquipmentResponse getEquipmentById(@PathVariable Long id) {
+  public EquipmentResponse getEquipmentById(@PathVariable @Positive Long id) {
     return equipmentService.getEquipmentDtoById(id);
   }
 
@@ -85,7 +88,7 @@ public class EquipmentController {
   @RolesAllowed("ADMIN")
   @PutMapping("/{id}")
   public EquipmentResponse updateEquipment(
-      @Valid @RequestBody EquipmentRequest request, @PathVariable Long id) {
+      @Valid @RequestBody EquipmentRequest request, @PathVariable @Positive Long id) {
 
     return equipmentService.updateEquipment(id, request.name());
   }
@@ -103,7 +106,7 @@ public class EquipmentController {
       })
   @RolesAllowed("ADMIN")
   @DeleteMapping("{id}")
-  public ResponseEntity<Void> deleteEquipment(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteEquipment(@PathVariable @Positive Long id) {
     equipmentService.deleteEquipment(id);
     return ResponseEntity.noContent().build();
   }

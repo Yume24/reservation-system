@@ -10,6 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -18,11 +22,13 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/rooms")
 @AllArgsConstructor
+@Validated
 @Tag(name = "Room Management", description = "Endpoints for managing rooms")
 public class RoomController {
   private final RoomService roomService;
@@ -48,7 +54,7 @@ public class RoomController {
         @ApiResponse(responseCode = "404", description = "Room not found")
       })
   @GetMapping("/{id}")
-  public RoomResponse getRoomById(@PathVariable Long id) {
+  public RoomResponse getRoomById(@PathVariable @Positive Long id) {
     return roomService.getRoomDtoById(id);
   }
 
@@ -66,10 +72,11 @@ public class RoomController {
       })
   @GetMapping("/available")
   public List<RoomResponseWithEquipment> getAvailableRooms(
-      @RequestParam(name = "capacity", required = false) Integer capacity,
-      @RequestParam(name = "from") Instant from,
-      @RequestParam(name = "to") Instant to,
-      @RequestParam(name = "equipmentNames", required = false) Set<String> equipmentNames) {
+      @RequestParam(name = "capacity", required = false) @Positive Integer capacity,
+      @RequestParam(name = "from") @FutureOrPresent Instant from,
+      @RequestParam(name = "to") @FutureOrPresent Instant to,
+      @RequestParam(name = "equipmentNames", required = false)
+          Set<@NotBlank @Size(max = 255) String> equipmentNames) {
     return roomService.getMatchingRooms(capacity, from, to, equipmentNames);
   }
 
@@ -102,7 +109,7 @@ public class RoomController {
   @PutMapping("/{id}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<RoomResponse> updateRoom(
-      @Valid @RequestBody RoomRequest request, @PathVariable Long id) {
+      @Valid @RequestBody RoomRequest request, @PathVariable @Positive Long id) {
     var newRoom = roomService.updateRoom(id, request.name(), request.capacity());
     return ResponseEntity.ok(newRoom);
   }
@@ -118,7 +125,7 @@ public class RoomController {
       })
   @DeleteMapping("/{id}")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteRoom(@PathVariable @Positive Long id) {
     roomService.deleteRoom(id);
     return ResponseEntity.noContent().build();
   }
@@ -137,7 +144,7 @@ public class RoomController {
   @PostMapping("/{roomId}/equipment/{equipmentId}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<Void> addEquipmentToRoom(
-      @PathVariable Long roomId, @PathVariable Long equipmentId) {
+      @PathVariable @Positive Long roomId, @PathVariable @Positive Long equipmentId) {
     roomService.addEquipmentToRoom(roomId, equipmentId);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
@@ -158,7 +165,7 @@ public class RoomController {
   @DeleteMapping("/{roomId}/equipment/{equipmentId}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<Void> removeEquipmentFromRoom(
-      @PathVariable Long roomId, @PathVariable Long equipmentId) {
+      @PathVariable @Positive Long roomId, @PathVariable @Positive Long equipmentId) {
     roomService.removeEquipmentFromRoom(roomId, equipmentId);
     return ResponseEntity.noContent().build();
   }

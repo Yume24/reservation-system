@@ -10,4 +10,9 @@ public class RoomExceptionHandler {
   public ResponseEntity<Void> handleRoomNotFoundException() {
     return ResponseEntity.notFound().build();
   }
+
+  @ExceptionHandler(AvailibilityException.class)
+  public ResponseEntity<Void> handleAvailibilityException() {
+    return ResponseEntity.badRequest().build();
+  }
 }
