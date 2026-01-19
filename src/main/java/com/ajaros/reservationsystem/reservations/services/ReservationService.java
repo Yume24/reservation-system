@@ -1,5 +1,6 @@
 package com.ajaros.reservationsystem.reservations.services;
 
+import com.ajaros.reservationsystem.reservations.configuration.ReservationConfiguration;
 import com.ajaros.reservationsystem.reservations.dtos.ReservationResponse;
 import com.ajaros.reservationsystem.reservations.entites.Reservation;
 import com.ajaros.reservationsystem.reservations.exceptions.InvalidReservationException;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor
 public class ReservationService {
+  private final ReservationConfiguration reservationConfiguration;
   private final ReservationRepository reservationRepository;
   private final ReservationMapper reservationMapper;
   private final RoomService roomService;
@@ -32,6 +34,7 @@ public class ReservationService {
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public ReservationResponse createReservation(Instant from, Instant to, Long roomId, Long userId) {
+    checkReservationDuration(from, to);
     checkRoomAvailability(from, to, roomId);
 
     var room = roomService.getRoomById(roomId);
@@ -57,6 +60,8 @@ public class ReservationService {
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public ReservationResponse updateReservationEntity(
       Long reservationId, Long userId, Long roomId, Instant fromDate, Instant toDate) {
+    checkReservationDuration(fromDate, toDate);
+
     var reservation = findReservationById(reservationId);
 
     checkIfUserHasPermissionToModifyReservation(reservation, userId);
@@ -102,5 +107,10 @@ public class ReservationService {
     return reservationRepository
         .findById(reservationId)
         .orElseThrow(() -> new ReservationNotFoundException(reservationId));
+  }
+
+  private void checkReservationDuration(Instant from, Instant to) {
+    if (from.until(to).compareTo(reservationConfiguration.getMaxDuration()) > 0)
+      throw new InvalidReservationException("Reservation duration exceeds the maximum allowed");
   }
 }
