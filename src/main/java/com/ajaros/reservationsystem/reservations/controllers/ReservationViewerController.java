@@ -29,7 +29,8 @@ public class ReservationViewerController {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved reservations"),
         @ApiResponse(responseCode = "400", description = "Invalid room ID or parameters"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - Viewer role required")
+        @ApiResponse(responseCode = "403", description = "Forbidden - Viewer role required"),
+        @ApiResponse(responseCode = "404", description = "Room not found")
       })
   @GetMapping("/{roomId}")
   public List<ReservationResponse> getRoomReservations(

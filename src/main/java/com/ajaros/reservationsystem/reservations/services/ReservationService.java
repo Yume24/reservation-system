@@ -27,6 +27,7 @@ public class ReservationService {
 
   public List<ReservationResponse> getFilteredReservations(
       Long userId, Instant from, Instant to, Long roomId) {
+    roomService.getRoomById(roomId);
     return reservationRepository.findFiltered(from, to, roomId, userId).stream()
         .map(reservationMapper::toReservationResponse)
         .toList();
