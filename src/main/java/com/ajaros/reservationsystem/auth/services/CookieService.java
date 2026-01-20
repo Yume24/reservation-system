@@ -9,7 +9,7 @@ public class CookieService {
     var cookie = new Cookie("refreshToken", token);
     cookie.setHttpOnly(true);
     cookie.setSecure(true);
-    cookie.setPath("/auth/**");
+    cookie.setPath("/auth");
     cookie.setMaxAge(duration);
 
     return cookie;
