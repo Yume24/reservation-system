@@ -12,6 +12,7 @@ services:
       DB_URL: ${DB_URL}
       JWT_SECRET: ${JWT_SECRET}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES}
   db:
     image: mysql:latest
     volumes:
@@ -24,8 +25,10 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
-      timeout: 5s
-      retries: 10
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
 volumes:
   db_data:
