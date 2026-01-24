@@ -57,11 +57,6 @@
             <version>1.6.3</version>
         </dependency>
         <dependency>
-            <groupId>me.paulschwarz</groupId>
-            <artifactId>springboot4-dotenv</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
@@ -129,17 +124,6 @@
     <build>
         <finalName>reservation-system</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>11.20.0</version>
-                <configuration>
-                    <url>jdbc:mysql://localhost:3306/reservation-system?createDatabaseIfNotExist=true</url>
-                    <user>root</user>
-                    <password>root</password>
-                    <cleanDisabled>false</cleanDisabled>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
