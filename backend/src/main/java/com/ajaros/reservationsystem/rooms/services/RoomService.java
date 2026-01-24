@@ -34,6 +34,10 @@ public class RoomService {
     return roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
   }
 
+  public void roomExists(Long id) {
+    if (!roomRepository.existsById(id)) throw new RoomNotFoundException(id);
+  }
+
   public List<RoomResponseWithEquipment> getMatchingRooms(
       Integer capacity, Instant from, Instant to, Set<String> equipmentNames) {
     validateDateRange(from, to);

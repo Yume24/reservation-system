@@ -27,7 +27,7 @@ public class ReservationService {
 
   public List<ReservationResponse> getFilteredReservations(
       Long userId, Instant from, Instant to, Long roomId) {
-    if (roomId != null) roomService.getRoomById(roomId);
+    if (roomId != null) roomService.roomExists(roomId);
     return reservationRepository.findFiltered(from, to, roomId, userId, null).stream()
         .map(reservationMapper::toReservationResponse)
         .toList();
@@ -64,21 +64,20 @@ public class ReservationService {
     var reservation = findReservationById(reservationId);
     checkIfUserHasPermissionToModifyReservation(reservation, userId);
 
-    return performUpdate(reservationId, roomId, fromDate, toDate);
+    return performUpdate(reservation, roomId, fromDate, toDate);
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public ReservationResponse updateReservationEntity(
       Long reservationId, long roomId, Instant fromDate, Instant toDate) {
-    return performUpdate(reservationId, roomId, fromDate, toDate);
+    return performUpdate(findReservationById(reservationId), roomId, fromDate, toDate);
   }
 
   private ReservationResponse performUpdate(
-      Long reservationId, Long roomId, Instant from, Instant to) {
+      Reservation reservation, Long roomId, Instant from, Instant to) {
 
     checkReservationDuration(from, to);
-    var reservation = findReservationById(reservationId);
-    checkRoomAvailability(from, to, roomId, reservationId);
+    checkRoomAvailability(from, to, roomId, reservation.getId());
 
     reservation.setFromDate(from);
     reservation.setToDate(to);
