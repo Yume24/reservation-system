@@ -1,0 +1,41 @@
+# Maven build output
+target/
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+.eclipse/
+.settings/
+
+# Test sources
+src/test/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+
+# Local environment files
+.env
+.env.local
+application-dev.yaml
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker files
+Dockerfile
+.dockerignore
