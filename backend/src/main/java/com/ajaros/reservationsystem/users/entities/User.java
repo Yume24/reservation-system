@@ -40,9 +40,11 @@ public class User implements UserDetails {
   private Role role;
 
   @OneToMany(mappedBy = "user")
+  @Builder.Default
   private Set<RefreshToken> refreshTokens = new HashSet<>();
 
   @OneToMany(mappedBy = "user")
+  @Builder.Default
   private Set<Reservation> reservations = new HashSet<>();
 
   @Override

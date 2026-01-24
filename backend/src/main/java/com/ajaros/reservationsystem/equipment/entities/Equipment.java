@@ -27,5 +27,6 @@ public class Equipment {
       name = "room_equipment",
       joinColumns = @JoinColumn(name = "equipment_id"),
       inverseJoinColumns = @JoinColumn(name = "room_id"))
+  @Builder.Default
   private Set<Room> rooms = new HashSet<>();
 }

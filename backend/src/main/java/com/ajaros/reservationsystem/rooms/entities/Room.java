@@ -27,6 +27,7 @@ public class Room {
   private Integer capacity;
 
   @ManyToMany(mappedBy = "rooms")
+  @Builder.Default
   private Set<Equipment> equipment = new HashSet<>();
 
   @OneToMany(mappedBy = "room")
