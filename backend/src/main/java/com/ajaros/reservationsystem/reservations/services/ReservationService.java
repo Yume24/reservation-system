@@ -28,7 +28,7 @@ public class ReservationService {
   public List<ReservationResponse> getFilteredReservations(
       Long userId, Instant from, Instant to, Long roomId) {
     if (roomId != null) roomService.getRoomById(roomId);
-    return reservationRepository.findFiltered(from, to, roomId, userId).stream()
+    return reservationRepository.findFiltered(from, to, roomId, userId, null).stream()
         .map(reservationMapper::toReservationResponse)
         .toList();
   }
@@ -61,43 +61,37 @@ public class ReservationService {
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public ReservationResponse updateReservationEntity(
       Long reservationId, Long userId, Long roomId, Instant fromDate, Instant toDate) {
-    checkReservationDuration(fromDate, toDate);
-
     var reservation = findReservationById(reservationId);
-
     checkIfUserHasPermissionToModifyReservation(reservation, userId);
-    checkRoomAvailability(fromDate, toDate, roomId, reservationId);
 
-    reservation = updateReservationEntity(reservation, fromDate, toDate, roomId);
-
-    return reservationMapper.toReservationResponse(reservation);
+    return performUpdate(reservationId, roomId, fromDate, toDate);
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public ReservationResponse updateReservationEntity(
       Long reservationId, long roomId, Instant fromDate, Instant toDate) {
-    var reservation = findReservationById(reservationId);
-
-    checkRoomAvailability(fromDate, toDate, roomId, reservationId);
-
-    reservation = updateReservationEntity(reservation, fromDate, toDate, roomId);
-
-    return reservationMapper.toReservationResponse(reservation);
+    return performUpdate(reservationId, roomId, fromDate, toDate);
   }
 
-  private Reservation updateReservationEntity(
-      Reservation reservation, Instant fromDate, Instant toDate, Long roomId) {
-    reservation.setFromDate(fromDate);
-    reservation.setToDate(toDate);
+  private ReservationResponse performUpdate(
+      Long reservationId, Long roomId, Instant from, Instant to) {
+
+    checkReservationDuration(from, to);
+    var reservation = findReservationById(reservationId);
+    checkRoomAvailability(from, to, roomId, reservationId);
+
+    reservation.setFromDate(from);
+    reservation.setToDate(to);
     reservation.setRoom(roomService.getRoomById(roomId));
 
-    return reservationRepository.save(reservation);
+    return reservationMapper.toReservationResponse(reservationRepository.save(reservation));
   }
 
   private void checkRoomAvailability(
       Instant from, Instant to, Long roomId, Long reservationIdToExclude) {
-    var reservations = reservationRepository.findFiltered(from, to, roomId, null);
-    if (reservations.stream().anyMatch(r -> !r.getId().equals(reservationIdToExclude)))
+    var reservations =
+        reservationRepository.findFiltered(from, to, roomId, null, reservationIdToExclude);
+    if (!reservations.isEmpty())
       throw new InvalidReservationException("Room is not available during the selected period");
   }
 
