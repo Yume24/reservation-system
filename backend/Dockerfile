@@ -2,7 +2,7 @@ FROM amazoncorretto:25-alpine
 
 WORKDIR /app
 
-COPY ./target/reservation-system-0.0.1-SNAPSHOT.jar app.jar
+COPY ./target/reservation-system.jar app.jar
 
 EXPOSE 8080
 

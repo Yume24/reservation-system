@@ -127,6 +127,7 @@
     </dependencies>
 
     <build>
+        <finalName>reservation-system</finalName>
         <plugins>
             <plugin>
                 <groupId>org.flywaydb</groupId>
