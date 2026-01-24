@@ -2,7 +2,7 @@ package com.ajaros.reservationsystem.reservations.services;
 
 import com.ajaros.reservationsystem.reservations.configuration.ReservationConfiguration;
 import com.ajaros.reservationsystem.reservations.dtos.ReservationResponse;
-import com.ajaros.reservationsystem.reservations.entites.Reservation;
+import com.ajaros.reservationsystem.reservations.entities.Reservation;
 import com.ajaros.reservationsystem.reservations.exceptions.InvalidReservationException;
 import com.ajaros.reservationsystem.reservations.exceptions.ReservationNotFoundException;
 import com.ajaros.reservationsystem.reservations.mappers.ReservationMapper;
@@ -27,7 +27,7 @@ public class ReservationService {
 
   public List<ReservationResponse> getFilteredReservations(
       Long userId, Instant from, Instant to, Long roomId) {
-    roomService.getRoomById(roomId);
+    if (roomId != null) roomService.getRoomById(roomId);
     return reservationRepository.findFiltered(from, to, roomId, userId).stream()
         .map(reservationMapper::toReservationResponse)
         .toList();
@@ -36,7 +36,7 @@ public class ReservationService {
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public ReservationResponse createReservation(Instant from, Instant to, Long roomId, Long userId) {
     checkReservationDuration(from, to);
-    checkRoomAvailability(from, to, roomId);
+    checkRoomAvailability(from, to, roomId, null);
 
     var room = roomService.getRoomById(roomId);
     var user = userService.getUserById(userId);
@@ -66,18 +66,19 @@ public class ReservationService {
     var reservation = findReservationById(reservationId);
 
     checkIfUserHasPermissionToModifyReservation(reservation, userId);
-    checkRoomAvailability(fromDate, toDate, roomId);
+    checkRoomAvailability(fromDate, toDate, roomId, reservationId);
 
     reservation = updateReservationEntity(reservation, fromDate, toDate, roomId);
 
     return reservationMapper.toReservationResponse(reservation);
   }
 
+  @Transactional(isolation = Isolation.SERIALIZABLE)
   public ReservationResponse updateReservationEntity(
       Long reservationId, long roomId, Instant fromDate, Instant toDate) {
     var reservation = findReservationById(reservationId);
 
-    checkRoomAvailability(fromDate, toDate, roomId);
+    checkRoomAvailability(fromDate, toDate, roomId, reservationId);
 
     reservation = updateReservationEntity(reservation, fromDate, toDate, roomId);
 
@@ -93,9 +94,10 @@ public class ReservationService {
     return reservationRepository.save(reservation);
   }
 
-  private void checkRoomAvailability(Instant from, Instant to, Long roomId) {
+  private void checkRoomAvailability(
+      Instant from, Instant to, Long roomId, Long reservationIdToExclude) {
     var reservations = reservationRepository.findFiltered(from, to, roomId, null);
-    if (!reservations.isEmpty())
+    if (reservations.stream().anyMatch(r -> !r.getId().equals(reservationIdToExclude)))
       throw new InvalidReservationException("Room is not available during the selected period");
   }
 

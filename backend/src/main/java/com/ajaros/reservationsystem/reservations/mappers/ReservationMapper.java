@@ -1,7 +1,7 @@
 package com.ajaros.reservationsystem.reservations.mappers;
 
 import com.ajaros.reservationsystem.reservations.dtos.ReservationResponse;
-import com.ajaros.reservationsystem.reservations.entites.Reservation;
+import com.ajaros.reservationsystem.reservations.entities.Reservation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

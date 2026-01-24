@@ -1,4 +1,4 @@
-package com.ajaros.reservationsystem.reservations.entites;
+package com.ajaros.reservationsystem.reservations.entities;
 
 import com.ajaros.reservationsystem.rooms.entities.Room;
 import com.ajaros.reservationsystem.users.entities.User;

@@ -1,6 +1,6 @@
 package com.ajaros.reservationsystem.reservations.repositories;
 
-import com.ajaros.reservationsystem.reservations.entites.Reservation;
+import com.ajaros.reservationsystem.reservations.entities.Reservation;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +12,8 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 """
 SELECT r FROM Reservation r
 WHERE
-(:from IS NULL OR :from >= r.fromDate)
-AND (:to IS NULL OR :to <= r.toDate)
+(:from IS NULL OR :from < r.toDate)
+AND (:to IS NULL OR :to > r.fromDate)
 AND (:roomId IS NULL OR :roomId = r.room.id)
 AND (:userId IS NULL OR :userId = r.user.id)
 """)
