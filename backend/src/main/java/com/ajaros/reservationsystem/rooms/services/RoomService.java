@@ -4,7 +4,6 @@ import com.ajaros.reservationsystem.equipment.services.EquipmentService;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponse;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponseWithEquipment;
 import com.ajaros.reservationsystem.rooms.entities.Room;
-import com.ajaros.reservationsystem.rooms.exceptions.AvailabilityException;
 import com.ajaros.reservationsystem.rooms.exceptions.RoomNotFoundException;
 import com.ajaros.reservationsystem.rooms.mappers.RoomMapper;
 import com.ajaros.reservationsystem.rooms.repositories.RoomRepository;
@@ -42,6 +41,7 @@ public class RoomService {
     }
   }
 
+  @Transactional
   public List<RoomResponseWithEquipment> getMatchingRooms(
       Integer capacity, Instant from, Instant to, Set<String> equipmentNames) {
     validateDateRange(from, to);
@@ -76,6 +76,9 @@ public class RoomService {
   @Transactional
   public void addEquipmentToRoom(Long roomId, Long equipmentId) {
     var room = getRoomById(roomId);
+    if (room.getEquipment().contains(equipmentService.getEquipmentById(equipmentId))) {
+      throw new IllegalArgumentException("Equipment already assigned to room");
+    }
     var equipment = equipmentService.getEquipmentById(equipmentId);
     room.getEquipment().add(equipment);
   }
@@ -83,13 +86,16 @@ public class RoomService {
   @Transactional
   public void removeEquipmentFromRoom(Long roomId, Long equipmentId) {
     var room = getRoomById(roomId);
+    if (!room.getEquipment().contains(equipmentService.getEquipmentById(equipmentId))) {
+      throw new IllegalArgumentException("Equipment not assigned to room");
+    }
     var equipment = equipmentService.getEquipmentById(equipmentId);
     room.getEquipment().remove(equipment);
   }
 
   private void validateDateRange(Instant from, Instant to) {
     if (from.isAfter(to)) {
-      throw new AvailabilityException("From date must be before to date");
+      throw new IllegalArgumentException("From date must be before to date");
     }
   }
 }

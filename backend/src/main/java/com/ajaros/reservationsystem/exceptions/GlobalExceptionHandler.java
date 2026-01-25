@@ -85,4 +85,11 @@ public class GlobalExceptionHandler {
         new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", "Malformed request body");
     return ResponseEntity.badRequest().body(response);
   }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+    var response =
+        new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", ex.getMessage());
+    return ResponseEntity.badRequest().body(response);
+  }
 }
