@@ -39,16 +39,14 @@ public class ReservationService {
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public ReservationResponse createReservation(
-      Instant from, Instant to, Long roomId, Long userId) {
+  public ReservationResponse createReservation(Instant from, Instant to, Long roomId, Long userId) {
     validateReservationDuration(from, to);
     validateRoomAvailability(from, to, roomId, null);
 
     var room = roomService.getRoomById(roomId);
     var user = userService.getUserById(userId);
 
-    var reservation =
-        Reservation.builder().fromDate(from).toDate(to).user(user).room(room).build();
+    var reservation = Reservation.builder().fromDate(from).toDate(to).user(user).room(room).build();
 
     return reservationMapper.toReservationResponse(reservationRepository.save(reservation));
   }

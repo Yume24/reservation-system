@@ -23,10 +23,10 @@ public class AuthenticatedUserIdResolver implements HandlerMethodArgumentResolve
 
   @Override
   public Object resolveArgument(
-          @NonNull MethodParameter parameter,
-          ModelAndViewContainer mavContainer,
-          @NonNull NativeWebRequest webRequest,
-          WebDataBinderFactory binderFactory) {
+      @NonNull MethodParameter parameter,
+      ModelAndViewContainer mavContainer,
+      @NonNull NativeWebRequest webRequest,
+      WebDataBinderFactory binderFactory) {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
       return jwt.getClaims().get("id");

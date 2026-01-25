@@ -23,10 +23,10 @@ public final class RoomSpecifications {
       }
 
       Subquery<Long> subquery = query.subquery(Long.class);
-      var reservation = subquery.from(root.getModel())
-          .join("reservations", JoinType.INNER);
+      var reservation = subquery.from(root.getModel()).join("reservations", JoinType.INNER);
 
-      subquery.select(cb.literal(1L))
+      subquery
+          .select(cb.literal(1L))
           .where(
               cb.and(
                   cb.equal(reservation.getParent().get("id"), root.get("id")),
@@ -47,7 +47,8 @@ public final class RoomSpecifications {
       var roomEquipment = subquery.from(root.getModel());
       var equipment = roomEquipment.join("equipment", JoinType.INNER);
 
-      subquery.select(cb.countDistinct(equipment.get("name")))
+      subquery
+          .select(cb.countDistinct(equipment.get("name")))
           .where(
               cb.and(
                   cb.equal(roomEquipment.get("id"), root.get("id")),

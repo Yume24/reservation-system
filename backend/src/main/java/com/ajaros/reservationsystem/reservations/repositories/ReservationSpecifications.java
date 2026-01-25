@@ -9,28 +9,23 @@ public final class ReservationSpecifications {
   private ReservationSpecifications() {}
 
   public static Specification<Reservation> hasUserId(Long userId) {
-    return (root, _, cb) ->
-        userId == null ? null : cb.equal(root.get("user").get("id"), userId);
+    return (root, _, cb) -> userId == null ? null : cb.equal(root.get("user").get("id"), userId);
   }
 
   public static Specification<Reservation> hasRoomId(Long roomId) {
-    return (root, _, cb) ->
-        roomId == null ? null : cb.equal(root.get("room").get("id"), roomId);
+    return (root, _, cb) -> roomId == null ? null : cb.equal(root.get("room").get("id"), roomId);
   }
 
   public static Specification<Reservation> startsAfterOrAt(Instant from) {
-    return (root, _, cb) ->
-        from == null ? null : cb.lessThan(root.get("toDate"), from).not();
+    return (root, _, cb) -> from == null ? null : cb.lessThan(root.get("toDate"), from).not();
   }
 
   public static Specification<Reservation> endsBefore(Instant to) {
-    return (root, _, cb) ->
-        to == null ? null : cb.greaterThan(root.get("fromDate"), to).not();
+    return (root, _, cb) -> to == null ? null : cb.greaterThan(root.get("fromDate"), to).not();
   }
 
   public static Specification<Reservation> excludeId(Long excludeId) {
-    return (root, _, cb) ->
-        excludeId == null ? null : cb.notEqual(root.get("id"), excludeId);
+    return (root, _, cb) -> excludeId == null ? null : cb.notEqual(root.get("id"), excludeId);
   }
 
   public static Specification<Reservation> filtered(

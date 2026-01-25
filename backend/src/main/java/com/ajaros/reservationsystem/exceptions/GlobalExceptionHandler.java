@@ -50,8 +50,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
       ResourceNotFoundException ex) {
-    var response =
-        new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getMessage());
+    var response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
   }
 
@@ -64,24 +63,21 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ConflictException.class)
   public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex) {
-    var response =
-        new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict", ex.getMessage());
+    var response = new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict", ex.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
   }
 
   @ExceptionHandler({UnauthorizedException.class, BadCredentialsException.class})
   public ResponseEntity<ErrorResponse> handleUnauthorizedException() {
     var response =
-        new ErrorResponse(
-            HttpStatus.UNAUTHORIZED.value(), "Unauthorized", "Authentication failed");
+        new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Unauthorized", "Authentication failed");
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException() {
     var response =
-        new ErrorResponse(
-            HttpStatus.BAD_REQUEST.value(), "Bad Request", "Malformed request body");
+        new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", "Malformed request body");
     return ResponseEntity.badRequest().body(response);
   }
 }

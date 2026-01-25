@@ -35,8 +35,7 @@ public class UserController {
       })
   @PatchMapping
   public ResponseEntity<Void> updateUserInformation(
-      @Valid @RequestBody UpdateUserInformationRequest request,
-      @AuthenticatedUserId Long userId) {
+      @Valid @RequestBody UpdateUserInformationRequest request, @AuthenticatedUserId Long userId) {
     userService.updateUserInformation(userId, request);
     return ResponseEntity.noContent().build();
   }

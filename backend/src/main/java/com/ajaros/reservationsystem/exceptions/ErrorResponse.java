@@ -6,11 +6,7 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ErrorResponse(
-    int status,
-    String error,
-    String message,
-    Instant timestamp,
-    Map<String, String> fieldErrors) {
+    int status, String error, String message, Instant timestamp, Map<String, String> fieldErrors) {
 
   public ErrorResponse(int status, String error, String message) {
     this(status, error, message, Instant.now(), null);
