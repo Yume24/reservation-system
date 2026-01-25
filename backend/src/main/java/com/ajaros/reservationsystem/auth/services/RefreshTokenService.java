@@ -58,8 +58,9 @@ public class RefreshTokenService {
 
   private RefreshToken validateRefreshToken(Jwt refreshToken) {
     var expirationDate = jwtService.getExpirationFromToken(refreshToken);
-    if (expirationDate.isBefore(Instant.now()))
+    if (expirationDate.isBefore(Instant.now())) {
       throw new InvalidTokenException("Expired refresh token");
+    }
     return refreshTokenRepository
         .findByToken(HashUtility.hash(refreshToken.getTokenValue()))
         .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));

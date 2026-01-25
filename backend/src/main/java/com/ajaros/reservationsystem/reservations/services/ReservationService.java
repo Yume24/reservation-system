@@ -56,7 +56,7 @@ public class ReservationService {
   public void deleteReservation(Long reservationId, Long userId) {
     var reservation = findReservationById(reservationId);
     validateOwnership(reservation, userId);
-    reservationRepository.deleteById(reservationId);
+    reservationRepository.delete(reservation);
   }
 
   public void deleteReservation(Long reservationId) {
@@ -90,7 +90,7 @@ public class ReservationService {
     reservation.setToDate(to);
     reservation.setRoom(roomService.getRoomById(roomId));
 
-    return reservationMapper.toReservationResponse(reservationRepository.save(reservation));
+    return reservationMapper.toReservationResponse(reservation);
   }
 
   private void validateRoomAvailability(
