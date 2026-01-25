@@ -8,7 +8,4 @@ public class UserNotFoundException extends ResourceNotFoundException {
     super("User not found");
   }
 
-  public UserNotFoundException(Long id) {
-    super("User", id);
-  }
 }

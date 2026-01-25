@@ -2,7 +2,6 @@ package com.ajaros.reservationsystem.auth.services;
 
 import com.ajaros.reservationsystem.auth.configuration.JwtConfiguration;
 import com.ajaros.reservationsystem.users.entities.User;
-import com.ajaros.reservationsystem.users.services.UserService;
 import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,6 @@ public class JwtService {
   private final JwtConfiguration jwtConfiguration;
   private final JwtDecoder jwtDecoder;
   private final JwtEncoder jwtEncoder;
-  private final UserService userService;
 
   public String generateAccessToken(User user) {
     return generateToken(user, jwtConfiguration.getAccessTokenExpiration());

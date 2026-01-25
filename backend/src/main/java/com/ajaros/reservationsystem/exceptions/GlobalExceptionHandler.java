@@ -2,7 +2,6 @@ package com.ajaros.reservationsystem.exceptions;
 
 import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +70,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler({UnauthorizedException.class, BadCredentialsException.class})
-  public ResponseEntity<ErrorResponse> handleUnauthorizedException(RuntimeException ex) {
+  public ResponseEntity<ErrorResponse> handleUnauthorizedException() {
     var response =
         new ErrorResponse(
             HttpStatus.UNAUTHORIZED.value(), "Unauthorized", "Authentication failed");
@@ -79,8 +78,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
-      HttpMessageNotReadableException ex) {
+  public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException() {
     var response =
         new ErrorResponse(
             HttpStatus.BAD_REQUEST.value(), "Bad Request", "Malformed request body");
