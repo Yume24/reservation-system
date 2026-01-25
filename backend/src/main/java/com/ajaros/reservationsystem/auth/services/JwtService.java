@@ -23,16 +23,12 @@ public class JwtService {
     return generateToken(user, jwtConfiguration.getRefreshTokenExpiration());
   }
 
-  public Instant getExpirationFromToken(String token) {
-    return getExpirationFromToken(jwtDecoder.decode(token));
+  public Jwt decode(String token) {
+    return jwtDecoder.decode(token);
   }
 
   public Instant getExpirationFromToken(Jwt token) {
     return token.getExpiresAt();
-  }
-
-  public Instant getIssuedAtFromToken(String token) {
-    return getIssuedAtFromToken(jwtDecoder.decode(token));
   }
 
   public Instant getIssuedAtFromToken(Jwt token) {
@@ -49,9 +45,5 @@ public class JwtService {
             .expiresAt(Instant.now().plusSeconds(expiration))
             .build();
     return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-  }
-
-  public Jwt decode(String refreshToken) {
-    return jwtDecoder.decode(refreshToken);
   }
 }

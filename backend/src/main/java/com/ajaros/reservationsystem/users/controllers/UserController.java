@@ -13,11 +13,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
 @AllArgsConstructor
+@Validated
 @Tag(name = "User Management", description = "Endpoints for managing user profile and password")
 public class UserController {
 

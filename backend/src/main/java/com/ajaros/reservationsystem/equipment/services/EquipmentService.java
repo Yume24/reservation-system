@@ -40,10 +40,13 @@ public class EquipmentService {
   public EquipmentResponse updateEquipment(Long id, String newName) {
     var equipment = getEquipmentById(id);
     equipment.setName(newName);
-    return equipmentMapper.toEquipmentResponse(equipmentRepository.save(equipment));
+    return equipmentMapper.toEquipmentResponse(equipment);
   }
 
   public void deleteEquipment(Long id) {
+    if (!equipmentRepository.existsById(id)) {
+      throw new EquipmentNotFoundException(id);
+    }
     equipmentRepository.deleteById(id);
   }
 }

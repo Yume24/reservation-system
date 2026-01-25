@@ -3,7 +3,7 @@ package com.ajaros.reservationsystem.auth.services;
 import com.ajaros.reservationsystem.auth.entities.RefreshToken;
 import com.ajaros.reservationsystem.auth.exceptions.InvalidTokenException;
 import com.ajaros.reservationsystem.auth.repositories.RefreshTokenRepository;
-import com.ajaros.reservationsystem.auth.utils.AuthTokensInfo;
+import com.ajaros.reservationsystem.auth.dtos.AuthTokensInfo;
 import com.ajaros.reservationsystem.auth.utils.HashUtility;
 import com.ajaros.reservationsystem.users.entities.User;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
@@ -21,8 +21,9 @@ public class RefreshTokenService {
   private final UserMapper userMapper;
 
   public void saveRefreshToken(String refreshToken, User user) {
-    var creationDate = jwtService.getIssuedAtFromToken(refreshToken);
-    var expirationDate = jwtService.getExpirationFromToken(refreshToken);
+    var decodedToken = jwtService.decode(refreshToken);
+    var creationDate = jwtService.getIssuedAtFromToken(decodedToken);
+    var expirationDate = jwtService.getExpirationFromToken(decodedToken);
 
     var refreshTokenEntity =
         RefreshToken.builder()

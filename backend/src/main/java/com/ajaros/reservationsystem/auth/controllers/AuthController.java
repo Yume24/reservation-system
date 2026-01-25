@@ -8,9 +8,8 @@ import com.ajaros.reservationsystem.auth.dtos.RegisterResponse;
 import com.ajaros.reservationsystem.auth.services.AuthService;
 import com.ajaros.reservationsystem.auth.services.CookieService;
 import com.ajaros.reservationsystem.auth.services.RefreshTokenService;
-import com.ajaros.reservationsystem.auth.utils.AuthTokensInfo;
+import com.ajaros.reservationsystem.auth.dtos.AuthTokensInfo;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
-import com.ajaros.reservationsystem.users.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +36,6 @@ public class AuthController {
   private final JwtConfiguration jwtConfiguration;
   private final RefreshTokenService refreshTokenService;
   private final CookieService cookieService;
-  private final UserService userService;
 
   @Operation(summary = "Register a new user", description = "Creates a new user account")
   @ApiResponses(
@@ -48,8 +46,8 @@ public class AuthController {
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(
       @Valid @RequestBody RegisterRequest registerRequest) {
-    var registerResponse = userService.registerUser(registerRequest);
-    return ResponseEntity.status(201).body(registerResponse);
+    var registerResponse = authService.registerUser(registerRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
   }
 
   @Operation(
@@ -66,7 +64,7 @@ public class AuthController {
   public ResponseEntity<LoginResponse> login(
       @Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
     var authTokensInfo = authService.login(loginRequest);
-    return getLoginResponseResponseEntity(authTokensInfo, response);
+    return buildLoginResponse(authTokensInfo, response);
   }
 
   @Operation(
@@ -82,7 +80,7 @@ public class AuthController {
   public ResponseEntity<LoginResponse> refreshToken(
       @CookieValue("refreshToken") @NotBlank String refreshToken, HttpServletResponse response) {
     var authTokensInfo = refreshTokenService.issueNewRefreshToken(refreshToken);
-    return getLoginResponseResponseEntity(authTokensInfo, response);
+    return buildLoginResponse(authTokensInfo, response);
   }
 
   @Operation(
@@ -98,23 +96,18 @@ public class AuthController {
   public ResponseEntity<Void> logout(
       @CookieValue("refreshToken") @NotBlank String refreshToken, HttpServletResponse response) {
     refreshTokenService.logout(refreshToken);
-    var cookie = cookieService.deleteRefreshTokenCookie();
-    response.addCookie(cookie);
+    response.addCookie(cookieService.deleteRefreshTokenCookie());
     return ResponseEntity.noContent().build();
   }
 
-  private @NonNull ResponseEntity<LoginResponse> getLoginResponseResponseEntity(
+  private ResponseEntity<LoginResponse> buildLoginResponse(
       AuthTokensInfo authTokensInfo, HttpServletResponse response) {
-    var user = authTokensInfo.user();
-    var accessToken = authTokensInfo.accessToken();
-    var refreshToken = authTokensInfo.refreshToken();
-
     var refreshTokenCookie =
         cookieService.createRefreshTokenCookie(
-            refreshToken, (int) jwtConfiguration.getRefreshTokenExpiration());
-
+            authTokensInfo.refreshToken(), (int) jwtConfiguration.getRefreshTokenExpiration());
     response.addCookie(refreshTokenCookie);
 
-    return ResponseEntity.ok(userMapper.toLoginResponse(user, accessToken));
+    return ResponseEntity.ok(
+        userMapper.toLoginResponse(authTokensInfo.user(), authTokensInfo.accessToken()));
   }
 }

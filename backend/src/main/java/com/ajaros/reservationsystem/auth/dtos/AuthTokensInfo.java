@@ -1,4 +1,4 @@
-package com.ajaros.reservationsystem.auth.utils;
+package com.ajaros.reservationsystem.auth.dtos;
 
 import com.ajaros.reservationsystem.users.dtos.UserInformationResponse;
 

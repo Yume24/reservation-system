@@ -1,12 +1,13 @@
 package com.ajaros.reservationsystem.reservations.dtos;
 
-import com.ajaros.reservationsystem.reservations.exceptions.InvalidReservationException;
+import com.ajaros.reservationsystem.validation.ValidDateRange;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.Instant;
 
+@ValidDateRange
 public record ReservationRequest(
     @Schema(example = "2026-01-20T10:00:00Z")
         @NotNull(message = "From date is required")
@@ -19,10 +20,4 @@ public record ReservationRequest(
     @Schema(example = "1")
         @NotNull(message = "Room ID is required")
         @Positive(message = "Room ID must be greater than zero")
-        long roomId) {
-  public ReservationRequest {
-    if (fromDate.isAfter(toDate)) {
-      throw new InvalidReservationException("From date must be before to date");
-    }
-  }
-}
+        long roomId) {}

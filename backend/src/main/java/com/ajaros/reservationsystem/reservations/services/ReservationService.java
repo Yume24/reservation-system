@@ -13,6 +13,7 @@ import com.ajaros.reservationsystem.users.services.UserService;
 import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ public class ReservationService {
   public List<ReservationResponse> getFilteredReservations(
       Long userId, Instant from, Instant to, Long roomId) {
     if (roomId != null) {
-      roomService.roomExists(roomId);
+      roomService.validateRoomExists(roomId);
     }
     var spec = ReservationSpecifications.filtered(from, to, roomId, userId, null);
     return reservationRepository.findAll(spec).stream()
@@ -59,6 +60,9 @@ public class ReservationService {
   }
 
   public void deleteReservation(Long reservationId) {
+    if (!reservationRepository.existsById(reservationId)) {
+      throw new ReservationNotFoundException(reservationId);
+    }
     reservationRepository.deleteById(reservationId);
   }
 
@@ -98,7 +102,7 @@ public class ReservationService {
 
   private void validateOwnership(Reservation reservation, Long userId) {
     if (!reservation.getUser().getId().equals(userId)) {
-      throw new InvalidReservationException("Unauthorized");
+      throw new AccessDeniedException("You do not have permission to modify this reservation");
     }
   }
 

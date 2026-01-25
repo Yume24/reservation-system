@@ -1,7 +1,10 @@
 package com.ajaros.reservationsystem.auth.dtos;
 
+import com.ajaros.reservationsystem.validation.ValidPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record RegisterRequest(
     @Schema(example = "user@example.com")
@@ -19,10 +22,7 @@ public record RegisterRequest(
         String surname,
     @Schema(example = "Password123!")
         @NotBlank(message = "Password cannot be blank")
-        @Size(min = 8, message = "Password must be at least 8 characters")
-        @Pattern(
-            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).+$",
-            message = "Password must contain uppercase, lowercase, number, and special character")
+        @ValidPassword
         String password) {
   public RegisterRequest {
     name = name.trim();

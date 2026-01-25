@@ -36,8 +36,10 @@ public class RoomService {
     return roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
   }
 
-  public void roomExists(Long id) {
-    if (!roomRepository.existsById(id)) throw new RoomNotFoundException(id);
+  public void validateRoomExists(Long id) {
+    if (!roomRepository.existsById(id)) {
+      throw new RoomNotFoundException(id);
+    }
   }
 
   public List<RoomResponseWithEquipment> getMatchingRooms(
@@ -61,11 +63,13 @@ public class RoomService {
     var room = getRoomById(id);
     room.setName(newName);
     room.setCapacity(newCapacity);
-    var updatedRoom = roomRepository.save(room);
-    return roomMapper.toRoomResponse(updatedRoom);
+    return roomMapper.toRoomResponse(room);
   }
 
   public void deleteRoom(Long id) {
+    if (!roomRepository.existsById(id)) {
+      throw new RoomNotFoundException(id);
+    }
     roomRepository.deleteById(id);
   }
 
@@ -73,20 +77,14 @@ public class RoomService {
   public void addEquipmentToRoom(Long roomId, Long equipmentId) {
     var room = getRoomById(roomId);
     var equipment = equipmentService.getEquipmentById(equipmentId);
-
     room.getEquipment().add(equipment);
-
-    roomRepository.save(room);
   }
 
   @Transactional
   public void removeEquipmentFromRoom(Long roomId, Long equipmentId) {
     var room = getRoomById(roomId);
     var equipment = equipmentService.getEquipmentById(equipmentId);
-
     room.getEquipment().remove(equipment);
-
-    roomRepository.save(room);
   }
 
   private void validateDateRange(Instant from, Instant to) {
