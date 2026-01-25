@@ -1,6 +1,6 @@
 FROM maven:3.9-amazoncorretto-25-alpine AS build
 
-WORKDIR /app
+WORKDIR /build
 
 COPY pom.xml .
 RUN mvn dependency:go-offline
@@ -13,7 +13,15 @@ FROM amazoncorretto:25-alpine
 
 WORKDIR /app
 
-COPY --from=build app/target/reservation-system.jar app.jar
+RUN addgroup -S spring \
+    && adduser -S springuser -G spring \
+    && chown springuser:spring /app
+
+COPY --from=build build/target/reservation-system.jar app.jar
+RUN chown springuser:spring app.jar
+
+
+USER springuser
 
 EXPOSE 8080
 
