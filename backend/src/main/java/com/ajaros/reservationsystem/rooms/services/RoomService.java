@@ -92,7 +92,9 @@ public class RoomService {
   }
 
   private Room getRoomWithEquipmentById(Long id) {
-    return roomRepository.findWithEquipmentById(id).orElseThrow(() -> new RoomNotFoundException(id));
+    return roomRepository
+        .findWithEquipmentById(id)
+        .orElseThrow(() -> new RoomNotFoundException(id));
   }
 
   private void validateDateRange(Instant from, Instant to) {

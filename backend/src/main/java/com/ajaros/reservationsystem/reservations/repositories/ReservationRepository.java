@@ -4,7 +4,6 @@ import com.ajaros.reservationsystem.reservations.entities.Reservation;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -18,13 +17,11 @@ public interface ReservationRepository
 
   @Override
   @EntityGraph(attributePaths = {"room", "user"})
-  @NonNull
-  List<Reservation> findAll(@NonNull Specification<Reservation> spec);
+  @NonNull List<Reservation> findAll(@NonNull Specification<Reservation> spec);
 
   @Override
   @EntityGraph(attributePaths = {"room", "user"})
-  @NonNull
-  Optional<Reservation> findById(Long id);
+  @NonNull Optional<Reservation> findById(Long id);
 
   @Query(
       """
