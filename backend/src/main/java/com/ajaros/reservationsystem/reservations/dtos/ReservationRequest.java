@@ -20,4 +20,4 @@ public record ReservationRequest(
     @Schema(example = "1")
         @NotNull(message = "Room ID is required")
         @Positive(message = "Room ID must be greater than zero")
-        long roomId) {}
+        Long roomId) {}

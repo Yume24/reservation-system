@@ -28,6 +28,7 @@ public class ReservationService {
   private final RoomService roomService;
   private final UserService userService;
 
+  @Transactional(readOnly = true)
   public List<ReservationResponse> getFilteredReservations(
       Long userId, Instant from, Instant to, Long roomId) {
     if (roomId != null) {
@@ -59,6 +60,7 @@ public class ReservationService {
     reservationRepository.delete(reservation);
   }
 
+  @Transactional
   public void deleteReservation(Long reservationId) {
     if (!reservationRepository.existsById(reservationId)) {
       throw new ReservationNotFoundException(reservationId);

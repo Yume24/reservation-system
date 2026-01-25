@@ -41,7 +41,7 @@ public class RoomService {
     }
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public List<RoomResponseWithEquipment> getMatchingRooms(
       Integer capacity, Instant from, Instant to, Set<String> equipmentNames) {
     validateDateRange(from, to);
@@ -75,22 +75,24 @@ public class RoomService {
 
   @Transactional
   public void addEquipmentToRoom(Long roomId, Long equipmentId) {
-    var room = getRoomById(roomId);
-    if (room.getEquipment().contains(equipmentService.getEquipmentById(equipmentId))) {
+    var room = getRoomWithEquipmentById(roomId);
+    var equipment = equipmentService.getEquipmentById(equipmentId);
+    if (!room.getEquipment().add(equipment)) {
       throw new IllegalArgumentException("Equipment already assigned to room");
     }
-    var equipment = equipmentService.getEquipmentById(equipmentId);
-    room.getEquipment().add(equipment);
   }
 
   @Transactional
   public void removeEquipmentFromRoom(Long roomId, Long equipmentId) {
-    var room = getRoomById(roomId);
-    if (!room.getEquipment().contains(equipmentService.getEquipmentById(equipmentId))) {
+    var room = getRoomWithEquipmentById(roomId);
+    var equipment = equipmentService.getEquipmentById(equipmentId);
+    if (!room.getEquipment().remove(equipment)) {
       throw new IllegalArgumentException("Equipment not assigned to room");
     }
-    var equipment = equipmentService.getEquipmentById(equipmentId);
-    room.getEquipment().remove(equipment);
+  }
+
+  private Room getRoomWithEquipmentById(Long id) {
+    return roomRepository.findWithEquipmentById(id).orElseThrow(() -> new RoomNotFoundException(id));
   }
 
   private void validateDateRange(Instant from, Instant to) {
