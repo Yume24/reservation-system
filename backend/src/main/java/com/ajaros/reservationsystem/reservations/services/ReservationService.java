@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor
 public class ReservationService {
+
   private final ReservationConfiguration reservationConfiguration;
   private final ReservationRepository reservationRepository;
   private final ReservationMapper reservationMapper;
@@ -27,57 +28,60 @@ public class ReservationService {
 
   public List<ReservationResponse> getFilteredReservations(
       Long userId, Instant from, Instant to, Long roomId) {
-    if (roomId != null) roomService.roomExists(roomId);
+    if (roomId != null) {
+      roomService.roomExists(roomId);
+    }
     return reservationRepository.findFiltered(from, to, roomId, userId, null).stream()
         .map(reservationMapper::toReservationResponse)
         .toList();
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public ReservationResponse createReservation(Instant from, Instant to, Long roomId, Long userId) {
-    checkReservationDuration(from, to);
-    checkRoomAvailability(from, to, roomId, null);
+  public ReservationResponse createReservation(
+      Instant from, Instant to, Long roomId, Long userId) {
+    validateReservationDuration(from, to);
+    validateRoomAvailability(from, to, roomId, null);
 
     var room = roomService.getRoomById(roomId);
     var user = userService.getUserById(userId);
 
-    var reservation = Reservation.builder().fromDate(from).toDate(to).user(user).room(room).build();
+    var reservation =
+        Reservation.builder().fromDate(from).toDate(to).user(user).room(room).build();
 
     return reservationMapper.toReservationResponse(reservationRepository.save(reservation));
   }
 
   @Transactional
-  public void deleteReservation(Long reservationId, long userId) {
+  public void deleteReservation(Long reservationId, Long userId) {
     var reservation = findReservationById(reservationId);
-    checkIfUserHasPermissionToModifyReservation(reservation, userId);
-
-    deleteReservation(reservationId);
+    validateOwnership(reservation, userId);
+    reservationRepository.deleteById(reservationId);
   }
 
+  @Transactional
   public void deleteReservation(Long reservationId) {
     reservationRepository.deleteById(reservationId);
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public ReservationResponse updateReservationEntity(
+  public ReservationResponse updateReservation(
       Long reservationId, Long userId, Long roomId, Instant fromDate, Instant toDate) {
     var reservation = findReservationById(reservationId);
-    checkIfUserHasPermissionToModifyReservation(reservation, userId);
-
+    validateOwnership(reservation, userId);
     return performUpdate(reservation, roomId, fromDate, toDate);
   }
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public ReservationResponse updateReservationEntity(
-      Long reservationId, long roomId, Instant fromDate, Instant toDate) {
-    return performUpdate(findReservationById(reservationId), roomId, fromDate, toDate);
+  public ReservationResponse updateReservation(
+      Long reservationId, Long roomId, Instant fromDate, Instant toDate) {
+    var reservation = findReservationById(reservationId);
+    return performUpdate(reservation, roomId, fromDate, toDate);
   }
 
   private ReservationResponse performUpdate(
       Reservation reservation, Long roomId, Instant from, Instant to) {
-
-    checkReservationDuration(from, to);
-    checkRoomAvailability(from, to, roomId, reservation.getId());
+    validateReservationDuration(from, to);
+    validateRoomAvailability(from, to, roomId, reservation.getId());
 
     reservation.setFromDate(from);
     reservation.setToDate(to);
@@ -86,17 +90,19 @@ public class ReservationService {
     return reservationMapper.toReservationResponse(reservationRepository.save(reservation));
   }
 
-  private void checkRoomAvailability(
+  private void validateRoomAvailability(
       Instant from, Instant to, Long roomId, Long reservationIdToExclude) {
-    var reservations =
+    var conflictingReservations =
         reservationRepository.findFiltered(from, to, roomId, null, reservationIdToExclude);
-    if (!reservations.isEmpty())
+    if (!conflictingReservations.isEmpty()) {
       throw new InvalidReservationException("Room is not available during the selected period");
+    }
   }
 
-  private void checkIfUserHasPermissionToModifyReservation(Reservation reservation, Long userId) {
-    if (!reservation.getUser().getId().equals(userId))
+  private void validateOwnership(Reservation reservation, Long userId) {
+    if (!reservation.getUser().getId().equals(userId)) {
       throw new InvalidReservationException("Unauthorized");
+    }
   }
 
   private Reservation findReservationById(Long reservationId) {
@@ -105,8 +111,9 @@ public class ReservationService {
         .orElseThrow(() -> new ReservationNotFoundException(reservationId));
   }
 
-  private void checkReservationDuration(Instant from, Instant to) {
-    if (from.until(to).compareTo(reservationConfiguration.getMaxDuration()) > 0)
+  private void validateReservationDuration(Instant from, Instant to) {
+    if (from.until(to).compareTo(reservationConfiguration.getMaxDuration()) > 0) {
       throw new InvalidReservationException("Reservation duration exceeds the maximum allowed");
+    }
   }
 }

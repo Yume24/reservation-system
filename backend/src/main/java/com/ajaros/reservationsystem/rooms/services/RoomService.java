@@ -4,7 +4,7 @@ import com.ajaros.reservationsystem.equipment.services.EquipmentService;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponse;
 import com.ajaros.reservationsystem.rooms.dtos.RoomResponseWithEquipment;
 import com.ajaros.reservationsystem.rooms.entities.Room;
-import com.ajaros.reservationsystem.rooms.exceptions.AvailibilityException;
+import com.ajaros.reservationsystem.rooms.exceptions.AvailabilityException;
 import com.ajaros.reservationsystem.rooms.exceptions.RoomNotFoundException;
 import com.ajaros.reservationsystem.rooms.mappers.RoomMapper;
 import com.ajaros.reservationsystem.rooms.repositories.RoomRepository;
@@ -89,7 +89,7 @@ public class RoomService {
   }
 
   private void validateDateRange(Instant from, Instant to) {
-    if (from.isAfter(to)) throw new AvailibilityException("From date must be before to date");
+    if (from.isAfter(to)) throw new AvailabilityException("From date must be before to date");
   }
 
   private int getEquipmentCount(Set<String> equipmentNames) {

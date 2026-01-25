@@ -14,8 +14,6 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/rooms")
@@ -90,11 +89,14 @@ public class RoomController {
       })
   @PostMapping
   @RolesAllowed("ADMIN")
-  public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody RoomRequest request)
-      throws URISyntaxException {
-
+  public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody RoomRequest request) {
     var room = roomService.createRoom(request.name(), request.capacity());
-    return ResponseEntity.created(new URI("/rooms/" + room.id())).body(room);
+    var location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(room.id())
+            .toUri();
+    return ResponseEntity.created(location).body(room);
   }
 
   @Operation(summary = "Update an existing room", description = "Updates room details by its ID")

@@ -78,7 +78,7 @@ public class ReservationManagerController {
   public ResponseEntity<ReservationResponse> updateReservation(
       @PathVariable @Positive Long reservationId, @Valid @RequestBody ReservationRequest request) {
     var reservation =
-        reservationService.updateReservationEntity(
+        reservationService.updateReservation(
             reservationId, request.roomId(), request.fromDate(), request.toDate());
     return ResponseEntity.ok(reservation);
   }

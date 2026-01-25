@@ -1,7 +1,10 @@
 package com.ajaros.reservationsystem.reservations.exceptions;
 
-public class ReservationNotFoundException extends RuntimeException {
+import com.ajaros.reservationsystem.exceptions.ResourceNotFoundException;
+
+public class ReservationNotFoundException extends ResourceNotFoundException {
+
   public ReservationNotFoundException(Long id) {
-    super("Reservation with id " + id + " not found");
+    super("Reservation", id);
   }
 }

@@ -25,10 +25,6 @@ public class JwtService {
     return generateToken(user, jwtConfiguration.getRefreshTokenExpiration());
   }
 
-  public long getUserIdFromToken(Jwt token) {
-    return (long) token.getClaims().get("id");
-  }
-
   public Instant getExpirationFromToken(String token) {
     return getExpirationFromToken(jwtDecoder.decode(token));
   }
@@ -43,11 +39,6 @@ public class JwtService {
 
   public Instant getIssuedAtFromToken(Jwt token) {
     return token.getIssuedAt();
-  }
-
-  public User getUserFromToken(Jwt token) {
-    var userId = getUserIdFromToken(token);
-    return userService.getUserById(userId);
   }
 
   private String generateToken(User user, long expiration) {

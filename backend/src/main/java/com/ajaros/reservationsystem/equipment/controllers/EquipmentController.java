@@ -10,13 +10,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/equipment")
@@ -70,10 +69,14 @@ public class EquipmentController {
   @RolesAllowed("ADMIN")
   @PostMapping
   public ResponseEntity<EquipmentResponse> createEquipment(
-      @Valid @RequestBody EquipmentRequest request) throws URISyntaxException {
+      @Valid @RequestBody EquipmentRequest request) {
     var createdEquipment = equipmentService.createEquipment(request.name());
-    return ResponseEntity.created(new URI("/equipment/" + createdEquipment.id()))
-        .body(createdEquipment);
+    var location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(createdEquipment.id())
+            .toUri();
+    return ResponseEntity.created(location).body(createdEquipment);
   }
 
   @Operation(summary = "Update equipment", description = "Updates equipment details by its ID")

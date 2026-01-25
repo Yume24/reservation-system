@@ -1,6 +1,6 @@
 package com.ajaros.reservationsystem.users.controllers;
 
-import com.ajaros.reservationsystem.auth.services.JwtService;
+import com.ajaros.reservationsystem.auth.annotations.AuthenticatedUserId;
 import com.ajaros.reservationsystem.users.dtos.UpdatePasswordRequest;
 import com.ajaros.reservationsystem.users.dtos.UpdateUserInformationRequest;
 import com.ajaros.reservationsystem.users.dtos.UserInformationResponse;
@@ -13,8 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,8 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @Tag(name = "User Management", description = "Endpoints for managing user profile and password")
 public class UserController {
+
   private final UserService userService;
-  private final JwtService jwtService;
   private final UserMapper userMapper;
 
   @Operation(
@@ -38,8 +36,7 @@ public class UserController {
   @PatchMapping
   public ResponseEntity<Void> updateUserInformation(
       @Valid @RequestBody UpdateUserInformationRequest request,
-      @AuthenticationPrincipal Jwt token) {
-    var userId = jwtService.getUserIdFromToken(token);
+      @AuthenticatedUserId Long userId) {
     userService.updateUserInformation(userId, request);
     return ResponseEntity.noContent().build();
   }
@@ -54,8 +51,8 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
       })
   @GetMapping
-  public UserInformationResponse getUserInformation(@AuthenticationPrincipal Jwt token) {
-    var user = jwtService.getUserFromToken(token);
+  public UserInformationResponse getUserInformation(@AuthenticatedUserId Long userId) {
+    var user = userService.getUserById(userId);
     return userMapper.toUserInformation(user);
   }
 
@@ -72,8 +69,7 @@ public class UserController {
       })
   @PatchMapping("/password")
   public ResponseEntity<Void> updateUserPassword(
-      @Valid @RequestBody UpdatePasswordRequest request, @AuthenticationPrincipal Jwt token) {
-    var userId = jwtService.getUserIdFromToken(token);
+      @Valid @RequestBody UpdatePasswordRequest request, @AuthenticatedUserId Long userId) {
     userService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
     return ResponseEntity.noContent().build();
   }

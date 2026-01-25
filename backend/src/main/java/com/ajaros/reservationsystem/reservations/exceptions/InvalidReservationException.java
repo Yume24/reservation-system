@@ -1,6 +1,9 @@
 package com.ajaros.reservationsystem.reservations.exceptions;
 
-public class InvalidReservationException extends RuntimeException {
+import com.ajaros.reservationsystem.exceptions.BusinessException;
+
+public class InvalidReservationException extends BusinessException {
+
   public InvalidReservationException(String message) {
     super(message);
   }

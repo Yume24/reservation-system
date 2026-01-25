@@ -1,6 +1,9 @@
 package com.ajaros.reservationsystem.auth.exceptions;
 
-public class InvalidTokenException extends RuntimeException {
+import com.ajaros.reservationsystem.exceptions.UnauthorizedException;
+
+public class InvalidTokenException extends UnauthorizedException {
+
   public InvalidTokenException(String message) {
     super(message);
   }

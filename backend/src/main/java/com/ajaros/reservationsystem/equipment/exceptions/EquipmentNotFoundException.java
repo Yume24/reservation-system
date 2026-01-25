@@ -1,7 +1,10 @@
 package com.ajaros.reservationsystem.equipment.exceptions;
 
-public class EquipmentNotFoundException extends RuntimeException {
+import com.ajaros.reservationsystem.exceptions.ResourceNotFoundException;
+
+public class EquipmentNotFoundException extends ResourceNotFoundException {
+
   public EquipmentNotFoundException(Long id) {
-    super("Equipment with id " + id + " not found");
+    super("Equipment", id);
   }
 }

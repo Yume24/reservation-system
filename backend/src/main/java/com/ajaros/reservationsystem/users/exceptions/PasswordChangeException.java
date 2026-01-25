@@ -1,9 +1,9 @@
 package com.ajaros.reservationsystem.users.exceptions;
 
-import lombok.NoArgsConstructor;
+import com.ajaros.reservationsystem.exceptions.BusinessException;
 
-@NoArgsConstructor
-public class PasswordChangeException extends RuntimeException {
+public class PasswordChangeException extends BusinessException {
+
   public PasswordChangeException(String message) {
     super(message);
   }

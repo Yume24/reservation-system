@@ -1,12 +1,13 @@
 package com.ajaros.reservationsystem.exceptions;
 
-import com.ajaros.reservationsystem.users.exceptions.UserNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,22 +17,23 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, String>> handleValidationException(
+  public ResponseEntity<ErrorResponse> handleValidationException(
       MethodArgumentNotValidException ex) {
     var errors = new HashMap<String, String>();
-
     ex.getBindingResult()
         .getFieldErrors()
         .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-    return ResponseEntity.badRequest().body(errors);
+    var response =
+        new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(), "Validation Failed", "Invalid input data", errors);
+    return ResponseEntity.badRequest().body(response);
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<Map<String, String>> handleConstraintViolationException(
+  public ResponseEntity<ErrorResponse> handleConstraintViolationException(
       ConstraintViolationException ex) {
     var errors = new HashMap<String, String>();
-
     ex.getConstraintViolations()
         .forEach(
             violation -> {
@@ -40,16 +42,48 @@ public class GlobalExceptionHandler {
               errors.put(fieldName, violation.getMessage());
             });
 
-    return ResponseEntity.badRequest().body(errors);
+    var response =
+        new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(), "Validation Failed", "Invalid input data", errors);
+    return ResponseEntity.badRequest().body(response);
   }
 
-  @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<Void> handleUserNotFoundException() {
-    return ResponseEntity.notFound().build();
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
+      ResourceNotFoundException ex) {
+    var response =
+        new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Not Found", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+  }
+
+  @ExceptionHandler(BusinessException.class)
+  public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
+    var response =
+        new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", ex.getMessage());
+    return ResponseEntity.badRequest().body(response);
+  }
+
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex) {
+    var response =
+        new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+  }
+
+  @ExceptionHandler({UnauthorizedException.class, BadCredentialsException.class})
+  public ResponseEntity<ErrorResponse> handleUnauthorizedException(RuntimeException ex) {
+    var response =
+        new ErrorResponse(
+            HttpStatus.UNAUTHORIZED.value(), "Unauthorized", "Authentication failed");
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ResponseEntity<Void> handleHttpMessageNotReadableException() {
-    return ResponseEntity.badRequest().build();
+  public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+      HttpMessageNotReadableException ex) {
+    var response =
+        new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(), "Bad Request", "Malformed request body");
+    return ResponseEntity.badRequest().body(response);
   }
 }
