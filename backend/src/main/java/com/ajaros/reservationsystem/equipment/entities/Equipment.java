@@ -22,11 +22,7 @@ public class Equipment {
   @Column(name = "name")
   private String name;
 
-  @ManyToMany
-  @JoinTable(
-      name = "room_equipment",
-      joinColumns = @JoinColumn(name = "equipment_id"),
-      inverseJoinColumns = @JoinColumn(name = "room_id"))
+  @ManyToMany(mappedBy = "equipment")
   @Builder.Default
   private Set<Room> rooms = new HashSet<>();
 }

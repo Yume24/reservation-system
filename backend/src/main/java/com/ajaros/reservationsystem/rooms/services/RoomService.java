@@ -8,6 +8,8 @@ import com.ajaros.reservationsystem.rooms.exceptions.AvailabilityException;
 import com.ajaros.reservationsystem.rooms.exceptions.RoomNotFoundException;
 import com.ajaros.reservationsystem.rooms.mappers.RoomMapper;
 import com.ajaros.reservationsystem.rooms.repositories.RoomRepository;
+import com.ajaros.reservationsystem.rooms.repositories.RoomSpecifications;
+import org.springframework.data.domain.Sort;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -42,9 +44,8 @@ public class RoomService {
       Integer capacity, Instant from, Instant to, Set<String> equipmentNames) {
     validateDateRange(from, to);
 
-    return roomRepository
-        .findMatchingRooms(capacity, from, to, equipmentNames, getEquipmentCount(equipmentNames))
-        .stream()
+    var spec = RoomSpecifications.matchingCriteria(capacity, from, to, equipmentNames);
+    return roomRepository.findAll(spec, Sort.by("capacity")).stream()
         .map(roomMapper::toRoomResponseWithEquipment)
         .toList();
   }
@@ -89,10 +90,8 @@ public class RoomService {
   }
 
   private void validateDateRange(Instant from, Instant to) {
-    if (from.isAfter(to)) throw new AvailabilityException("From date must be before to date");
-  }
-
-  private int getEquipmentCount(Set<String> equipmentNames) {
-    return equipmentNames == null ? 0 : equipmentNames.size();
+    if (from.isAfter(to)) {
+      throw new AvailabilityException("From date must be before to date");
+    }
   }
 }

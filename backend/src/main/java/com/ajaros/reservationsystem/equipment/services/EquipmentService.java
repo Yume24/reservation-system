@@ -38,11 +38,9 @@ public class EquipmentService {
 
   @Transactional
   public EquipmentResponse updateEquipment(Long id, String newName) {
-    var equipment =
-        equipmentRepository.findById(id).orElseThrow(() -> new EquipmentNotFoundException(id));
+    var equipment = getEquipmentById(id);
     equipment.setName(newName);
-    var updatedEquipment = equipmentRepository.save(equipment);
-    return equipmentMapper.toEquipmentResponse(updatedEquipment);
+    return equipmentMapper.toEquipmentResponse(equipmentRepository.save(equipment));
   }
 
   public void deleteEquipment(Long id) {

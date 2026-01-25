@@ -7,6 +7,7 @@ import com.ajaros.reservationsystem.reservations.exceptions.InvalidReservationEx
 import com.ajaros.reservationsystem.reservations.exceptions.ReservationNotFoundException;
 import com.ajaros.reservationsystem.reservations.mappers.ReservationMapper;
 import com.ajaros.reservationsystem.reservations.repositories.ReservationRepository;
+import com.ajaros.reservationsystem.reservations.repositories.ReservationSpecifications;
 import com.ajaros.reservationsystem.rooms.services.RoomService;
 import com.ajaros.reservationsystem.users.services.UserService;
 import java.time.Instant;
@@ -31,7 +32,8 @@ public class ReservationService {
     if (roomId != null) {
       roomService.roomExists(roomId);
     }
-    return reservationRepository.findFiltered(from, to, roomId, userId, null).stream()
+    var spec = ReservationSpecifications.filtered(from, to, roomId, userId, null);
+    return reservationRepository.findAll(spec).stream()
         .map(reservationMapper::toReservationResponse)
         .toList();
   }
@@ -92,9 +94,7 @@ public class ReservationService {
 
   private void validateRoomAvailability(
       Instant from, Instant to, Long roomId, Long reservationIdToExclude) {
-    var conflictingReservations =
-        reservationRepository.findFiltered(from, to, roomId, null, reservationIdToExclude);
-    if (!conflictingReservations.isEmpty()) {
+    if (reservationRepository.existsConflicting(roomId, from, to, reservationIdToExclude)) {
       throw new InvalidReservationException("Room is not available during the selected period");
     }
   }

@@ -26,10 +26,15 @@ public class Room {
   @Column(name = "capacity")
   private Integer capacity;
 
-  @ManyToMany(mappedBy = "rooms")
+  @ManyToMany
+  @JoinTable(
+      name = "room_equipment",
+      joinColumns = @JoinColumn(name = "room_id"),
+      inverseJoinColumns = @JoinColumn(name = "equipment_id"))
   @Builder.Default
   private Set<Equipment> equipment = new HashSet<>();
 
   @OneToMany(mappedBy = "room")
+  @Builder.Default
   private Set<Reservation> reservations = new HashSet<>();
 }
