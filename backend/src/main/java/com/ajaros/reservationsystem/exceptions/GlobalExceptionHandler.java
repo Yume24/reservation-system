@@ -75,8 +75,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
-    var response =
-        new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Forbidden", ex.getMessage());
+    var response = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Forbidden", ex.getMessage());
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
   }
 

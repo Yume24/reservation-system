@@ -20,9 +20,7 @@ public record RegisterRequest(
         @NotBlank(message = "Surname cannot be blank")
         @Size(max = 255, message = "Surname must not be longer than 255 characters")
         String surname,
-    @Schema(example = "Password123!")
-        @NotBlank(message = "Password cannot be blank")
-        @ValidPassword
+    @Schema(example = "Password123!") @NotBlank(message = "Password cannot be blank") @ValidPassword
         String password) {
   public RegisterRequest {
     name = name.trim();

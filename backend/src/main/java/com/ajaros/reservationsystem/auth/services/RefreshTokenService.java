@@ -1,9 +1,9 @@
 package com.ajaros.reservationsystem.auth.services;
 
+import com.ajaros.reservationsystem.auth.dtos.AuthTokensInfo;
 import com.ajaros.reservationsystem.auth.entities.RefreshToken;
 import com.ajaros.reservationsystem.auth.exceptions.InvalidTokenException;
 import com.ajaros.reservationsystem.auth.repositories.RefreshTokenRepository;
-import com.ajaros.reservationsystem.auth.dtos.AuthTokensInfo;
 import com.ajaros.reservationsystem.auth.utils.HashUtility;
 import com.ajaros.reservationsystem.users.entities.User;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;

@@ -1,10 +1,10 @@
 package com.ajaros.reservationsystem.auth.services;
 
+import com.ajaros.reservationsystem.auth.dtos.AuthTokensInfo;
 import com.ajaros.reservationsystem.auth.dtos.LoginRequest;
 import com.ajaros.reservationsystem.auth.dtos.RegisterRequest;
 import com.ajaros.reservationsystem.auth.dtos.RegisterResponse;
 import com.ajaros.reservationsystem.auth.exceptions.UserAlreadyExistsException;
-import com.ajaros.reservationsystem.auth.dtos.AuthTokensInfo;
 import com.ajaros.reservationsystem.users.entities.Role;
 import com.ajaros.reservationsystem.users.entities.User;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;

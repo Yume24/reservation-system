@@ -1,6 +1,7 @@
 package com.ajaros.reservationsystem.auth.controllers;
 
 import com.ajaros.reservationsystem.auth.configuration.JwtConfiguration;
+import com.ajaros.reservationsystem.auth.dtos.AuthTokensInfo;
 import com.ajaros.reservationsystem.auth.dtos.LoginRequest;
 import com.ajaros.reservationsystem.auth.dtos.LoginResponse;
 import com.ajaros.reservationsystem.auth.dtos.RegisterRequest;
@@ -8,7 +9,6 @@ import com.ajaros.reservationsystem.auth.dtos.RegisterResponse;
 import com.ajaros.reservationsystem.auth.services.AuthService;
 import com.ajaros.reservationsystem.auth.services.CookieService;
 import com.ajaros.reservationsystem.auth.services.RefreshTokenService;
-import com.ajaros.reservationsystem.auth.dtos.AuthTokensInfo;
 import com.ajaros.reservationsystem.users.mappers.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
